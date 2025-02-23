@@ -41,7 +41,7 @@ public class FilmController {
         return filmService.update(newFilm);
     }
 
-    @PutMapping("/films/{filmId}/like/{userId}")
+    @PutMapping("/{filmId}/like/{userId}")
     public ResponseEntity<String> setLike(
             @PathVariable Long filmId,
             @PathVariable Long userId
@@ -49,7 +49,7 @@ public class FilmController {
         return ResponseEntity.ok(filmService.setLike(filmId, userId));
     }
 
-    @DeleteMapping("/films/{filmId}/like/{userId}")
+    @DeleteMapping("/{filmId}/like/{userId}")
     public ResponseEntity<String> deleteLike(
             @PathVariable Long filmId,
             @PathVariable Long userId

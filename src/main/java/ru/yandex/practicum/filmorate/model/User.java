@@ -5,6 +5,7 @@ import lombok.*;
 import ru.yandex.practicum.filmorate.validator.DateConstraint;
 
 import java.time.LocalDate;
+import java.util.*;
 
 @Data
 @Builder(toBuilder = true)
@@ -24,4 +25,16 @@ public class User {
 
     @DateConstraint(minDate = "1900-01-01", message = "Дата рождения не может быть в будущем")
     LocalDate birthday;
+
+    @Builder.Default
+    @Setter(AccessLevel.NONE)
+    Set<Long> friends = new HashSet<>();
+
+    public void setLike(Long userId) {
+        friends.add(userId);
+    }
+
+    public void deleteLike(Long userId) {
+        friends.remove(userId);
+    }
 }
