@@ -2,9 +2,8 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -22,6 +21,16 @@ public class FilmController {
         return filmService.findAll();
     }
 
+    @GetMapping("/{filmId}")
+    public Film get(@PathVariable Long filmId) {
+        return filmService.get(filmId);
+    }
+
+    @GetMapping("/popular")
+    public Collection<Film> getByPopularity(@RequestParam(defaultValue = "10") int count) {
+        return filmService.getByPopularity(count);
+    }
+
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
         return filmService.create(film);
@@ -29,15 +38,28 @@ public class FilmController {
 
     @PutMapping
     public Film update(@Valid @RequestBody Film newFilm) {
-        if (newFilm.getId() == null) {
-            throw new ValidationException("Id должен быть указан");
-        }
         return filmService.update(newFilm);
+    }
+
+    @PutMapping("/films/{filmId}/like/{userId}")
+    public ResponseEntity<String> setLike(
+            @PathVariable Long filmId,
+            @PathVariable Long userId
+    ) {
+        return ResponseEntity.ok(filmService.setLike(filmId, userId));
+    }
+
+    @DeleteMapping("/films/{filmId}/like/{userId}")
+    public ResponseEntity<String> deleteLike(
+            @PathVariable Long filmId,
+            @PathVariable Long userId
+    ) {
+        return ResponseEntity.ok(filmService.deleteLike(filmId, userId));
     }
 
 
 }
 
-//todo PUT /films/{id}/like/{userId} — пользователь ставит лайк фильму.~
-//todo DELETE /films/{id}/like/{userId} — пользователь удаляет лайк.
+//todo PUT /films/{id}/like/{userId} — пользователь ставит лайк фильму.-
+//todo DELETE /films/{id}/like/{userId} — пользователь удаляет лайк.-
 //todo GET /films/popular?count={count} — возвращает список из первых count фильмов по количеству лайков. Если значение параметра count не задано, верните первые 10

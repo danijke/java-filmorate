@@ -21,6 +21,11 @@ public class UserController {
         return userService.findAll();
     }
 
+    @GetMapping("/{userId}")
+    public User get(@PathVariable Long userId) {
+        return userService.get(userId);
+    }
+
     @PostMapping
     public User create(@Valid @RequestBody User user) {
         return userService.create(user);
@@ -28,10 +33,11 @@ public class UserController {
 
     @PutMapping
     public User update(@Valid @RequestBody User newUser) {
-        if (newUser.getId() == null) {
-            throw new ValidationException("Id должен быть указан");
-        }
         return userService.update(newUser);
     }
 }
 
+//todo PUT /users/{id}/friends/{friendId} — добавление в друзья.
+//todo DELETE /users/{id}/friends/{friendId} — удаление из друзей.
+//todo GET /users/{id}/friends — возвращаем список пользователей, являющихся его друзьями.
+//todo GET /users/{id}/friends/common/{otherId} — список друзей, общих с другим пользователем.

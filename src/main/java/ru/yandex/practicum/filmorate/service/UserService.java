@@ -25,6 +25,10 @@ public class UserService {
     }
 
     public User update(User newUser) {
+        if (newUser.getId() == null) {
+            throw new ValidationException("Id должен быть указан");
+        }
+
         User oldUser = userStorage.get(newUser.getId())
                 .orElseThrow(() -> new NotFoundException("пользователь с id = " + newUser.getId() + " не найден"));
 
@@ -45,5 +49,10 @@ public class UserService {
 
     public Collection<User> findAll() {
         return userStorage.getAll();
+    }
+
+    public User get(Long userId) {
+        return userStorage.get(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден"));
     }
 }

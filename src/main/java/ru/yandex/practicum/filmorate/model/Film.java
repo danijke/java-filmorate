@@ -5,6 +5,7 @@ import lombok.*;
 import ru.yandex.practicum.filmorate.validator.DateConstraint;
 
 import java.time.*;
+import java.util.*;
 
 @Data
 @Builder
@@ -23,4 +24,16 @@ public class Film {
 
     @Positive
     long duration;
+
+    @Builder.Default
+    @Setter(AccessLevel.NONE)
+    Set<Long> likes = new HashSet<>();
+
+    public void setLike(Long userId) {
+        likes.add(userId);
+    }
+
+    public void deleteLike(Long userId) {
+        likes.remove(userId);
+    }
 }
