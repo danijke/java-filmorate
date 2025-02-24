@@ -24,10 +24,4 @@ public class ErrorHandler {
     public ErrorResponse handleParameterNotValid(final ParameterNotValidException e) {
         return new ErrorResponse(String.format("Некорректное значение параметра %s: %s",e.getParameter(), e.getReason()));
     }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleThrowable(final Throwable e) {
-        return new ErrorResponse("Произошла непредвиденная ошибка.");
-    }
 }

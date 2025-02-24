@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.model.*;
 import java.util.*;
 
 @Component
-public class InMemoryUserStorage implements UserStorage{
+public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
 
     @Override
@@ -25,7 +25,6 @@ public class InMemoryUserStorage implements UserStorage{
         return users.values();
     }
 
-
     private long getNextId() {
         long currentMaxId = users.keySet()
                 .stream()
@@ -34,6 +33,4 @@ public class InMemoryUserStorage implements UserStorage{
                 .orElse(0);
         return ++currentMaxId;
     }
-
-
 }

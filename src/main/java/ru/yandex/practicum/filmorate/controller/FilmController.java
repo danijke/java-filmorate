@@ -2,13 +2,11 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.util.*;
-
+import java.util.Collection;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,24 +40,18 @@ public class FilmController {
     }
 
     @PutMapping("/{filmId}/like/{userId}")
-    public ResponseEntity<String> setLike(
+    public void setLike(
             @PathVariable Long filmId,
             @PathVariable Long userId
     ) {
-        return ResponseEntity.ok(filmService.setLike(filmId, userId));
+        filmService.setLike(filmId, userId);
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
-    public ResponseEntity<String> deleteLike(
+    public void deleteLike(
             @PathVariable Long filmId,
             @PathVariable Long userId
     ) {
-        return ResponseEntity.ok(filmService.deleteLike(filmId, userId));
+        filmService.deleteLike(filmId, userId);
     }
-
-
 }
-
-//todo PUT /films/{id}/like/{userId} — пользователь ставит лайк фильму.-
-//todo DELETE /films/{id}/like/{userId} — пользователь удаляет лайк.-
-//todo GET /films/popular?count={count} — возвращает список из первых count фильмов по количеству лайков. Если значение параметра count не задано, верните первые 10--

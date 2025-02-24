@@ -1,0 +1,7 @@
+spring:
+  main:
+    log-startup-info: off
+    banner-mode: off
+logging.level:
+    ru.yandex.practicum.filmorate: INFO
+logging.level.org.zalando.logbook: TRACE

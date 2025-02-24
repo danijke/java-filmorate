@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import ru.yandex.practicum.filmorate.validator.DateConstraint;
@@ -8,8 +9,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Data
-@Builder(toBuilder = true)
-@EqualsAndHashCode(of = {"login"})
+@EqualsAndHashCode(of = {"id"})
 public class User {
     Long id;
 
@@ -26,7 +26,7 @@ public class User {
     @DateConstraint(minDate = "1900-01-01", message = "Дата рождения не может быть в будущем")
     LocalDate birthday;
 
-    @Builder.Default
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     Set<Long> friends = new HashSet<>();

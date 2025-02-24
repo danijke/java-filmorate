@@ -4,7 +4,7 @@ import lombok.*;
 
 @AllArgsConstructor
 @Getter
-public class ParameterNotValidException extends IllegalArgumentException{
+public class ParameterNotValidException extends IllegalArgumentException {
     String parameter;
     String reason;
 }

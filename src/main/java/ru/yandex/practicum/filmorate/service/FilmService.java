@@ -38,16 +38,15 @@ public class FilmService {
         return oldFilm;
     }
 
-
     public Collection<Film> findAll() {
         return filmStorage.getAll();
     }
 
-    public String setLike(Long filmId, Long userId) {
+    public void setLike(Long filmId, Long userId) {
         User user = userService.get(userId);
         Film film = get(filmId);
         film.setLike(userId);
-        return String.format("пользователь %s добавил лайк фильму %s", user.getName(), film.getName());
+        log.info("пользователь {} добавил лайк фильму {}", user.getName(), film.getName());
     }
 
     public Film get(Long filmId) {
@@ -55,11 +54,11 @@ public class FilmService {
                 .orElseThrow(() -> new NotFoundException("фильм с id = " + filmId + " не найден"));
     }
 
-    public String deleteLike(Long filmId, Long userId) {
+    public void deleteLike(Long filmId, Long userId) {
         User user = userService.get(userId);
         Film film = get(filmId);
         film.deleteLike(userId);
-        return String.format("пользователь %s удалил лайк у фильма %s", user.getName(), film.getName());
+        log.info("пользователь {} удалил лайк у фильма {}", user.getName(), film.getName());
     }
 
     public Collection<Film> getByPopularity(int count) {
@@ -68,7 +67,8 @@ public class FilmService {
         }
 
         return filmStorage.getAll().stream()
-                .sorted(Comparator.comparing(film -> film.getLikes().size()))
+                .filter(film -> !film.getLikes().isEmpty())
+                .sorted((Comparator.comparingInt((Film film) -> film.getLikes().size()).reversed()))
                 .limit(count)
                 .toList();
     }

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.*;
-import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
@@ -56,19 +56,20 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден"));
     }
 
-    public String addFriend(Long userId, Long friendId) {
+    public void addFriend(Long userId, Long friendId) {
         User user = get(userId);
-        User friend = get(friendId);
+        User otherUser = get(friendId);
         user.setFriend(friendId);
-        return String.format("пользователь %s добавил в друзья пользователя %s", user.getName(), friend.getName());
+        otherUser.setFriend(userId);
+        log.info("пользователь {} добавил в друзья пользователя {}", user.getName(), otherUser.getName());
     }
 
-    public String deleteFriend(Long userId, Long friendId) {
+    public void deleteFriend(Long userId, Long friendId) {
         User user = get(userId);
-        User friend = get(friendId);
+        User otherUser = get(friendId);
         user.deleteFriend(friendId);
-        return String.format("пользователь %s удалил из друзей пользователя %s", user.getName(), friend.getName());
-
+        otherUser.deleteFriend(userId);
+        log.info("пользователь {} удалил из друзей пользователя {}", user.getName(), otherUser.getName());
     }
 
     public Collection<User> getFriends(Long userId) {

@@ -3,14 +3,13 @@ package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.*;
-import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.util.*;
+import java.util.Collection;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
@@ -29,6 +28,7 @@ public class UserController {
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
+        log.trace("пользователь {} прошел валидацию и будет добавлен", user.getLogin());
         return userService.create(user);
     }
 
@@ -38,19 +38,19 @@ public class UserController {
     }
 
     @PutMapping("/{userId}/friends/{friendId}")
-    public ResponseEntity<String> addFriend(
+    public void addFriend(
             @PathVariable Long userId,
             @PathVariable Long friendId
     ) {
-        return ResponseEntity.ok(userService.addFriend(userId, friendId));
+        userService.addFriend(userId, friendId);
     }
 
     @DeleteMapping("/{userId}/friends/{friendId}")
-    public ResponseEntity<String> deleteFriend(
+    public void deleteFriend(
             @PathVariable Long userId,
             @PathVariable Long friendId
     ) {
-        return ResponseEntity.ok(userService.deleteFriend(userId, friendId));
+        userService.deleteFriend(userId, friendId);
     }
 
     @GetMapping("/{userId}/friends")
@@ -61,15 +61,10 @@ public class UserController {
     }
 
     @GetMapping("{userId}/friends/common/{otherId}")
-    public Collection<User> getFriends(
+    public Collection<User> getMutualFriends(
             @PathVariable Long userId,
             @PathVariable Long otherId
     ) {
         return userService.getMutualFriends(userId, otherId);
     }
 }
-
-//todo PUT /users/{id}/friends/{friendId} — добавление в друзья.-
-//todo DELETE /users/{id}/friends/{friendId} — удаление из друзей.-
-//todo GET /users/{id}/friends — возвращаем список пользователей, являющихся его друзьями.-
-//todo GET /users/{id}/friends/common/{otherId} — список друзей, общих с другим пользователем. (cравнить через стрим id в Set id между собой)-

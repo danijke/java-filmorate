@@ -25,8 +25,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.values();
     }
 
-
-
     private long getNextId() {
         long currentMaxId = films.keySet().stream().mapToLong(id -> id).max().orElse(0);
         return ++currentMaxId;
