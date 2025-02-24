@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.Collection;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -36,7 +36,7 @@ public class UserService {
                 .anyMatch(user -> user.getEmail().equals(newUser.getEmail()) &&
                         !user.getId().equals(newUser.getId()));
         if (emailExits) {
-            throw new ValidationException("Этот имейл уже используется");
+            throw new ValidationException("Этот email уже используется");
         }
 
         oldUser.setEmail(newUser.getEmail());
@@ -54,5 +54,35 @@ public class UserService {
     public User get(Long userId) {
         return userStorage.get(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден"));
+    }
+
+    public String addFriend(Long userId, Long friendId) {
+        User user = get(userId);
+        User friend = get(friendId);
+        user.setFriend(friendId);
+        return String.format("пользователь %s добавил в друзья пользователя %s", user.getName(), friend.getName());
+    }
+
+    public String deleteFriend(Long userId, Long friendId) {
+        User user = get(userId);
+        User friend = get(friendId);
+        user.deleteFriend(friendId);
+        return String.format("пользователь %s удалил из друзей пользователя %s", user.getName(), friend.getName());
+
+    }
+
+    public Collection<User> getFriends(Long userId) {
+        return get(userId).getFriends().stream()
+                .map(this::get)
+                .toList();
+    }
+
+    public Collection<User> getMutualFriends(Long userId, Long otherUserId) {
+        Set<Long> otherUserFriends = new HashSet<>(get(otherUserId).getFriends());
+        otherUserFriends.retainAll(get(userId).getFriends());
+
+        return otherUserFriends.stream()
+                .map(this::get)
+                .toList();
     }
 }

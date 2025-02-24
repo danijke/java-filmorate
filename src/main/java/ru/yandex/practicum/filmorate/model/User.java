@@ -28,13 +28,18 @@ public class User {
 
     @Builder.Default
     @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
     Set<Long> friends = new HashSet<>();
 
-    public void setLike(Long userId) {
-        friends.add(userId);
+    public void setFriend(Long friendId) {
+        friends.add(friendId);
     }
 
-    public void deleteLike(Long userId) {
-        friends.remove(userId);
+    public void deleteFriend(Long friendId) {
+        friends.remove(friendId);
+    }
+
+    public Set<Long> getFriends() {
+        return Set.copyOf(friends);
     }
 }

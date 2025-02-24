@@ -54,8 +54,10 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/friends")
-    public Collection<User> getFriends() {
-        return userService.getFriends();
+    public Collection<User> getFriends(
+            @PathVariable Long userId
+    ) {
+        return userService.getFriends(userId);
     }
 
     @GetMapping("{userId}/friends/common/{otherId}")
@@ -63,11 +65,11 @@ public class UserController {
             @PathVariable Long userId,
             @PathVariable Long otherId
     ) {
-        return userService.getMutualFriends();
+        return userService.getMutualFriends(userId, otherId);
     }
 }
 
-//todo PUT /users/{id}/friends/{friendId} — добавление в друзья.
-//todo DELETE /users/{id}/friends/{friendId} — удаление из друзей.
-//todo GET /users/{id}/friends — возвращаем список пользователей, являющихся его друзьями.
-//todo GET /users/{id}/friends/common/{otherId} — список друзей, общих с другим пользователем. (cравнить через стрим id в Set id между собой)
+//todo PUT /users/{id}/friends/{friendId} — добавление в друзья.-
+//todo DELETE /users/{id}/friends/{friendId} — удаление из друзей.-
+//todo GET /users/{id}/friends — возвращаем список пользователей, являющихся его друзьями.-
+//todo GET /users/{id}/friends/common/{otherId} — список друзей, общих с другим пользователем. (cравнить через стрим id в Set id между собой)-
