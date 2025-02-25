@@ -28,12 +28,13 @@ public class UserService {
         if (newUser.getId() == null) {
             throw new ValidationException("Id должен быть указан");
         }
+        get(newUser.getId());
 
         userStorage.getAll().stream()
                 .filter(user -> user.getEmail().equals(newUser.getEmail()) && !user.getId().equals(newUser.getId()))
                 .findAny()
                 .ifPresent(user -> {
-                    throw new ValidationException("Этот email уже используется");
+                    throw new ValidationException(user.getEmail() + " email уже используется");
                 });
 
         return userStorage.update(newUser)
@@ -41,7 +42,7 @@ public class UserService {
                     log.info("пользователь c логином {} успешно обновлен", oldUser.getLogin());
                     return oldUser;
                 })
-                .orElseThrow(() -> new NotFoundException("фильм с id = " + newUser.getId() + " не найден"));
+                .orElseThrow(() -> new NotFoundException("пользователь с id = " + newUser.getId() + " не найден"));
     }
 
     public Collection<User> findAll() {
