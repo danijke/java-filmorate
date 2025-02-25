@@ -16,6 +16,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public void remove(Long id) {
+        films.remove(id);
+    }
+
+    @Override
     public Optional<Film> get(Long id) {
         return Optional.ofNullable(films.get(id));
     }
@@ -27,9 +32,14 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Optional<Film> update(Film newFilm) {
-        if (films.containsKey(newFilm.getId())) {
-
-        }
+        return Optional.ofNullable(films.get(newFilm.getId()))
+                .map(oldFilm -> {
+                    oldFilm.setName(newFilm.getName());
+                    oldFilm.setDescription(newFilm.getDescription());
+                    oldFilm.setReleaseDate(newFilm.getReleaseDate());
+                    oldFilm.setDuration(newFilm.getDuration());
+                    return oldFilm;
+                });
     }
 
     private long getNextId() {

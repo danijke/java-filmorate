@@ -16,6 +16,11 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public void remove(Long id) {
+        users.remove(id);
+    }
+
+    @Override
     public Optional<User> get(Long id) {
         return Optional.ofNullable(users.get(id));
     }
@@ -23,6 +28,18 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public Collection<User> getAll() {
         return users.values();
+    }
+
+    @Override
+    public Optional<User> update(User newUser) {
+        return Optional.ofNullable(users.get(newUser.getId()))
+                .map(oldUser -> {
+                    oldUser.setEmail(newUser.getEmail());
+                    oldUser.setLogin(newUser.getLogin());
+                    oldUser.setName(newUser.getName());
+                    oldUser.setBirthday(newUser.getBirthday());
+                    return oldUser;
+                });
     }
 
     private long getNextId() {

@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import ru.yandex.practicum.filmorate.validator.DateConstraint;
@@ -8,8 +8,8 @@ import ru.yandex.practicum.filmorate.validator.DateConstraint;
 import java.time.LocalDate;
 import java.util.*;
 
-@Builder
-@Getter @Setter
+@Getter
+@Setter
 @EqualsAndHashCode(of = {"id"})
 public class User {
     private Long id;
@@ -31,19 +31,15 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
-    @Builder.Default
-    private Set<Long> friends = new HashSet<>();
+    private Set<Long> friends;
 
     public User(Long id, String email, String login, String name, LocalDate birthday) {
         this.id = id;
         this.email = email;
         this.login = login;
+        this.name = name;
         this.birthday = birthday;
         this.friends = new HashSet<>();
-
-        if (name == null) {
-            this.name = login;
-        }
     }
 
     public void setFriend(Long friendId) {

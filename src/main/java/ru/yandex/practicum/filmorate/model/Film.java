@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import ru.yandex.practicum.filmorate.validator.DateConstraint;
@@ -8,8 +8,8 @@ import ru.yandex.practicum.filmorate.validator.DateConstraint;
 import java.time.*;
 import java.util.*;
 
-@Builder
-@Getter @Setter
+@Getter
+@Setter
 @EqualsAndHashCode(of = {"id"})
 public class Film {
     private Long id;
@@ -30,8 +30,7 @@ public class Film {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    @Builder.Default
-    private Set<Long> likes = new HashSet<>();
+    private Set<Long> likes;
 
     public Film(Long id, String name, String description, LocalDate releaseDate, long duration) {
         this.id = id;

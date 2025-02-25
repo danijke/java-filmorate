@@ -29,22 +29,19 @@ public class UserService {
             throw new ValidationException("Id должен быть указан");
         }
 
-        User oldUser = userStorage.get(newUser.getId())
-                .orElseThrow(() -> new NotFoundException("пользователь с id = " + newUser.getId() + " не найден"));
+        userStorage.getAll().stream()
+                .filter(user -> user.getEmail().equals(newUser.getEmail()) && !user.getId().equals(newUser.getId()))
+                .findAny()
+                .ifPresent(user -> {
+                    throw new ValidationException("Этот email уже используется");
+                });
 
-        boolean emailExits = userStorage.getAll().stream()
-                .anyMatch(user -> user.getEmail().equals(newUser.getEmail()) &&
-                        !user.getId().equals(newUser.getId()));
-        if (emailExits) {
-            throw new ValidationException("Этот email уже используется");
-        }
-
-        oldUser.setEmail(newUser.getEmail());
-        oldUser.setName(newUser.getName());
-        oldUser.setLogin(newUser.getLogin());
-        oldUser.setBirthday(newUser.getBirthday());
-        log.info("пользователь c логином {} успешно обновлен", oldUser.getLogin());
-        return oldUser;
+        return userStorage.update(newUser)
+                .map(oldUser -> {
+                    log.info("пользователь c логином {} успешно обновлен", oldUser.getLogin());
+                    return oldUser;
+                })
+                .orElseThrow(() -> new NotFoundException("фильм с id = " + newUser.getId() + " не найден"));
     }
 
     public Collection<User> findAll() {
@@ -87,3 +84,4 @@ public class UserService {
                 .toList();
     }
 }
+//todo добавить проверку на уникальный email в валидацию в будущем

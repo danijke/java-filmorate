@@ -25,3 +25,4 @@ public class ErrorHandler {
         return new ErrorResponse(String.format("Некорректное значение параметра %s: %s",e.getParameter(), e.getReason()));
     }
 }
+//todo добавить обработку ошибок из  @Valid (сообщения из аннотаций user, film)
