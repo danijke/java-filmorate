@@ -8,34 +8,49 @@ import ru.yandex.practicum.filmorate.validator.DateConstraint;
 import java.time.LocalDate;
 import java.util.*;
 
-@Data
+@Builder
+@Getter @Setter
 @EqualsAndHashCode(of = {"id"})
 public class User {
-    Long id;
+    private Long id;
 
     @NotBlank(message = "Электронная почта не может быть пустой")
     @Email(message = "Неверный формат электронной почты")
-    String email;
+    private String email;
 
     @NotBlank(message = "Логин не может быть пустым")
     @Pattern(regexp = "^[^\\s]+$", message = "Логин не должен содержать пробелы")
-    String login;
+    private String login;
 
-    String name;
+    private String name;
 
+    @NotNull
     @DateConstraint(minDate = "1900-01-01", message = "Дата рождения не может быть в будущем")
-    LocalDate birthday;
+    private LocalDate birthday;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
-    Set<Long> friends = new HashSet<>();
+    @Builder.Default
+    private Set<Long> friends = new HashSet<>();
+
+    public User(Long id, String email, String login, String name, LocalDate birthday) {
+        this.id = id;
+        this.email = email;
+        this.login = login;
+        this.birthday = birthday;
+        this.friends = new HashSet<>();
+
+        if (name == null) {
+            this.name = login;
+        }
+    }
 
     public void setFriend(Long friendId) {
         friends.add(friendId);
     }
 
-    public void deleteFriend(Long friendId) {
+    public void removeFriend(Long friendId) {
         friends.remove(friendId);
     }
 

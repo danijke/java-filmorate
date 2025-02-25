@@ -28,14 +28,12 @@ public class FilmService {
             throw new ValidationException("id должен быть указан");
         }
 
-        Film oldFilm = get(newFilm.getId());
-
-        oldFilm.setName(newFilm.getName());
-        oldFilm.setDescription(newFilm.getDescription());
-        oldFilm.setReleaseDate(newFilm.getReleaseDate());
-        oldFilm.setDuration(newFilm.getDuration());
-        log.info("фильм {} успешно обновлен", oldFilm.getName());
-        return oldFilm;
+        return filmStorage.update(newFilm)
+                .map(film -> {
+                    log.info("фильм {} успешно обновлен", film.getName());
+                    return film;
+                })
+                .orElseThrow(() -> new NotFoundException("фильм с id = " + newFilm.getId() + " не найден"));
     }
 
     public Collection<Film> findAll() {
@@ -57,7 +55,7 @@ public class FilmService {
     public void deleteLike(Long filmId, Long userId) {
         User user = userService.get(userId);
         Film film = get(filmId);
-        film.deleteLike(userId);
+        film.removeLike(userId);
         log.info("пользователь {} удалил лайк у фильма {}", user.getName(), film.getName());
     }
 

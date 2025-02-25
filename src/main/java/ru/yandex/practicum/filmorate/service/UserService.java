@@ -67,8 +67,8 @@ public class UserService {
     public void deleteFriend(Long userId, Long friendId) {
         User user = get(userId);
         User otherUser = get(friendId);
-        user.deleteFriend(friendId);
-        otherUser.deleteFriend(userId);
+        user.removeFriend(friendId);
+        otherUser.removeFriend(userId);
         log.info("пользователь {} удалил из друзей пользователя {}", user.getName(), otherUser.getName());
     }
 
