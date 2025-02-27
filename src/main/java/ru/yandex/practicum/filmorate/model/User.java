@@ -1,27 +1,56 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import ru.yandex.practicum.filmorate.validator.DateConstraint;
 
 import java.time.LocalDate;
+import java.util.*;
 
-@Data
-@Builder(toBuilder = true)
-@EqualsAndHashCode(of = {"login"})
+@Getter
+@Setter
+@EqualsAndHashCode(of = {"id"})
 public class User {
-    Long id;
+    private Long id;
 
     @NotBlank(message = "Электронная почта не может быть пустой")
     @Email(message = "Неверный формат электронной почты")
-    String email;
+    private String email;
 
     @NotBlank(message = "Логин не может быть пустым")
     @Pattern(regexp = "^[^\\s]+$", message = "Логин не должен содержать пробелы")
-    String login;
+    private String login;
 
-    String name;
+    private String name;
 
+    @NotNull
     @DateConstraint(minDate = "1900-01-01", message = "Дата рождения не может быть в будущем")
-    LocalDate birthday;
+    private LocalDate birthday;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
+    private Set<Long> friends;
+
+    public User(Long id, String email, String login, String name, LocalDate birthday) {
+        this.id = id;
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
+        this.friends = new HashSet<>();
+    }
+
+    public void setFriend(Long friendId) {
+        friends.add(friendId);
+    }
+
+    public void removeFriend(Long friendId) {
+        friends.remove(friendId);
+    }
+
+    public Set<Long> getFriends() {
+        return Set.copyOf(friends);
+    }
 }

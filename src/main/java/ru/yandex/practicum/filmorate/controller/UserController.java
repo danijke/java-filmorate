@@ -1,66 +1,70 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.*;
-import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.util.*;
+import java.util.Collection;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    private final Map<Long, User> users = new HashMap<>();
+    private final UserService userService;
 
     @GetMapping
     public Collection<User> findAll() {
-        return users.values();
+        return userService.findAll();
+    }
+
+    @GetMapping("/{userId}")
+    public User get(@PathVariable Long userId) {
+        return userService.get(userId);
     }
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
-        user.setId(getNextId());
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
-        }
-        users.put(user.getId(), user);
-        log.info("пользователь c логином {} успешно добавлен", user.getLogin());
-        return user;
+        log.trace("пользователь {} прошел валидацию и будет добавлен", user.getLogin());
+        return userService.create(user);
     }
 
     @PutMapping
     public User update(@Valid @RequestBody User newUser) {
-        if (newUser.getId() == null) {
-            throw new ValidationException("Id должен быть указан");
-        }
-        if (users.containsKey(newUser.getId())) {
-            boolean emailExits = users.values().stream()
-                    .anyMatch(user -> user.getEmail().equals(newUser.getEmail()) &&
-                                               !user.getId().equals(newUser.getId()));
-            if (emailExits) {
-                throw new ValidationException("Этот имейл уже используется");
-            }
-
-            User oldUser = users.get(newUser.getId());
-            oldUser.setEmail(newUser.getEmail());
-            oldUser.setName(newUser.getName());
-            oldUser.setLogin(newUser.getLogin());
-            oldUser.setBirthday(newUser.getBirthday());
-            log.info("пользователь c логином {} успешно обновлен", oldUser.getLogin());
-            return oldUser;
-        }
-        throw new NotFoundException("пользователь с id = " + newUser.getId() + " не найден");
+        return userService.update(newUser);
     }
 
+    @PutMapping("/{userId}/friends/{friendId}")
+    public void addFriend(
+            @PathVariable Long userId,
+            @PathVariable Long friendId
+    ) {
+        userService.addFriend(userId, friendId);
+    }
 
-    private long getNextId() {
-        long currentMaxId = users.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+    @DeleteMapping("/{userId}/friends/{friendId}")
+    public void deleteFriend(
+            @PathVariable Long userId,
+            @PathVariable Long friendId
+    ) {
+        userService.deleteFriend(userId, friendId);
+    }
+
+    @GetMapping("/{userId}/friends")
+    public Collection<User> getFriends(
+            @PathVariable Long userId
+    ) {
+        return userService.getFriends(userId);
+    }
+
+    @GetMapping("{userId}/friends/common/{otherId}")
+    public Collection<User> getMutualFriends(
+            @PathVariable Long userId,
+            @PathVariable Long otherId
+    ) {
+        return userService.getMutualFriends(userId, otherId);
     }
 }
