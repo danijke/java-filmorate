@@ -1,5 +1,5 @@
 # java-filmorate
-## Структура [баз данных](https://github.com/danijke/java-filmorate/blob/sql_diagram/diagram.jpg) -> [MIRO](https://miro.com/app/board/uXjVIQMs0_4=/?share_link_id=137127835375)
+## Структура [баз данных](https://github.com/danijke/java-filmorate/blob/sql_diagram/diagram_filmorate.jpg) -> [MIRO](https://miro.com/app/board/uXjVIQMs0_4=/?share_link_id=137127835375)
 ### film - хранит данные о фильме
 * film_id [PK] - id фильма
 * name - название фильма
