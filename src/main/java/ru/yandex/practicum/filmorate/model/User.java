@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.validator.DateConstraint;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -31,7 +32,7 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
-    private Set<Long> friends;
+    private Map<Long, FriendStatus> friends;
 
     public User(Long id, String email, String login, String name, LocalDate birthday) {
         this.id = id;
@@ -39,18 +40,24 @@ public class User {
         this.login = login;
         this.name = name;
         this.birthday = birthday;
-        this.friends = new HashSet<>();
+        this.friends = new HashMap<>();
     }
 
     public void setFriend(Long friendId) {
-        friends.add(friendId);
+        friends.put(friendId, FriendStatus.CONFIRMED);
     }
 
     public void removeFriend(Long friendId) {
         friends.remove(friendId);
     }
 
-    public Set<Long> getFriends() {
-        return Set.copyOf(friends);
+    public Stream<Map.Entry<Long, FriendStatus>> getFriends() {
+        return friends.entrySet().stream();
+    }
+
+    public static enum FriendStatus {
+        REQUESTED,
+        CONFIRMED,
+        NOT_CONFIRMED;
     }
 }

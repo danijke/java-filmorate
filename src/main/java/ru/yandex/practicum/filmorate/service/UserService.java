@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -71,18 +72,17 @@ public class UserService {
     }
 
     public Collection<User> getFriends(Long userId) {
-        return get(userId).getFriends().stream()
-                .map(this::get)
-                .toList();
+        return get(userId).getFriends()
+                .filter(entry -> entry.getValue().equals(User.FriendStatus.CONFIRMED))
+                .map(entry -> get(entry.getKey()))
+                .collect(Collectors.toSet());
     }
 
     public Collection<User> getMutualFriends(Long userId, Long otherUserId) {
-        Set<Long> otherUserFriends = new HashSet<>(get(otherUserId).getFriends());
-        otherUserFriends.retainAll(get(userId).getFriends());
+        Set<User> otherUserFriends = (Set<User>) (getFriends(otherUserId));
+        otherUserFriends.retainAll(getFriends(userId));
 
-        return otherUserFriends.stream()
-                .map(this::get)
-                .toList();
+        return otherUserFriends;
     }
 }
 //todo добавить проверку на уникальный email в валидацию в будущем
