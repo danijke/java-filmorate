@@ -53,8 +53,9 @@ JOIN (
 ### Запрос на вывод всех подтвержденных друзей пользователя по логину
 ```sql
 SELECT u.name
-FROM user u
-JOIN user_friends uf ON u.user_id = uf.user_friend_id
-JOIN user danijke ON uf.user_id = danijke.user_id
-WHERE danijke.login = 'danijke';
+FROM user_friends uf
+JOIN user u ON u.user_id = uf.user_friend_id
+JOIN friend_status fs ON uf.friend_status = fs.friend_status_id
+WHERE uf.user_id = (SELECT user_id FROM user WHERE login = 'danijke')
+  AND fs.status_name = 'confirmed';
 ```
