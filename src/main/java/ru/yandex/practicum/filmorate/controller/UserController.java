@@ -65,6 +65,6 @@ public class UserController {
             @PathVariable Long userId,
             @PathVariable Long otherId
     ) {
-        return userService.getMutualFriends(userId, otherId);
+        return userService.getJointFriends(userId, otherId);
     }
 }

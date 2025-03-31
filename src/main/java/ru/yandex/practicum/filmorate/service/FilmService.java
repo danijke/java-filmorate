@@ -17,10 +17,18 @@ public class FilmService {
 
     private final FilmStorage filmStorage;
 
+    public Film get(Long filmId) {
+        return filmStorage.findFilmById(filmId)
+                .orElseThrow(() -> new NotFoundException("фильм с id = " + filmId + " не найден"));
+    }
+
     public Film create(Film film) {
-        filmStorage.add(film);
-        log.info("фильм {} успешно добавлен", film.getName());
-        return film;
+        return filmStorage.saveFilm(film)
+                .map(f -> {
+                    log.info("фильм {} успешно добавлен", f.getName());
+                    return f;
+                })
+                .orElseThrow(() -> new NotFoundException("Ошибка при получении сохраненного фильма"));
     }
 
     public Film update(Film newFilm) {
@@ -28,7 +36,7 @@ public class FilmService {
             throw new ValidationException("id должен быть указан");
         }
 
-        return filmStorage.update(newFilm)
+        return filmStorage.updateFilm(newFilm)
                 .map(film -> {
                     log.info("фильм {} успешно обновлен", film.getName());
                     return film;
@@ -37,38 +45,25 @@ public class FilmService {
     }
 
     public Collection<Film> findAll() {
-        return filmStorage.getAll();
+        return filmStorage.getFilms();
     }
 
     public void setLike(Long filmId, Long userId) {
-        User user = userService.get(userId);
-        Film film = get(filmId);
-        film.setLike(userId);
-        log.info("пользователь {} добавил лайк фильму {}", user.getName(), film.getName());
-    }
-
-    public Film get(Long filmId) {
-        return filmStorage.get(filmId)
-                .orElseThrow(() -> new NotFoundException("фильм с id = " + filmId + " не найден"));
+        filmStorage.setLike(filmId, userId);
+        log.info("пользователь {} добавил лайк фильму {}", userId, filmId);
     }
 
     public void deleteLike(Long filmId, Long userId) {
-        User user = userService.get(userId);
-        Film film = get(filmId);
-        film.removeLike(userId);
-        log.info("пользователь {} удалил лайк у фильма {}", user.getName(), film.getName());
+        filmStorage.deleteLike(filmId, userId);
+        log.info("пользователь {} удалил лайк у фильма {}", userId, filmId);
     }
 
-    public Collection<Film> getByPopularity(int count) {
+    public Collection<Film> getPopular(int count) {
         if (count <= 0) {
             throw new ParameterNotValidException("count", "Некорректный размер выборки. Размер должен быть больше нуля");
         }
 
-        return filmStorage.getAll().stream()
-                .filter(film -> !film.getLikes().isEmpty())
-                .sorted((Comparator.comparingInt((Film film) -> film.getLikes().size()).reversed()))
-                .limit(count)
-                .toList();
+        return filmStorage.getPopular(count);
     }
 }
 

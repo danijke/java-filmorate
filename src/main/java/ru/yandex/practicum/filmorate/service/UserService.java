@@ -8,21 +8,26 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserStorage userStorage;
+    private final  UserStorage userStorage;
 
     public User create(User user) {
         if (user.getName() == null) {
             user.setName(user.getLogin());
         }
-        userStorage.add(user);
-        log.info("пользователь c логином {} успешно добавлен", user.getLogin());
-        return user;
+
+        return userStorage.saveUser(user)
+                .map(u -> {
+                    log.info("пользователь c логином {} успешно добавлен", user.getLogin());
+                    return u;
+                })
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Ошибка при получении сохраненного пользователя с логином = %s", user.getLogin())
+                ));
     }
 
     public User update(User newUser) {
@@ -51,38 +56,26 @@ public class UserService {
     }
 
     public User get(Long userId) {
-        return userStorage.get(userId)
+        return userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден"));
     }
 
     public void addFriend(Long userId, Long friendId) {
-        User user = get(userId);
-        User otherUser = get(friendId);
-        user.setFriend(friendId);
-        otherUser.setFriend(userId);
-        log.info("пользователь {} добавил в друзья пользователя {}", user.getName(), otherUser.getName());
+        userStorage.addFriend(userId, friendId);
+        log.info("пользователь {} добавил в друзья пользователя {}", userId, friendId);
     }
 
     public void deleteFriend(Long userId, Long friendId) {
-        User user = get(userId);
-        User otherUser = get(friendId);
-        user.removeFriend(friendId);
-        otherUser.removeFriend(userId);
-        log.info("пользователь {} удалил из друзей пользователя {}", user.getName(), otherUser.getName());
+        userStorage.deleteFriend(userId, friendId);
+        log.info("пользователь {} удалил из друзей пользователя {}", userId, friendId);
     }
 
     public Collection<User> getFriends(Long userId) {
-        return get(userId).getFriends()
-                .filter(entry -> entry.getValue().equals(User.FriendStatus.CONFIRMED))
-                .map(entry -> get(entry.getKey()))
-                .collect(Collectors.toSet());
+        return userStorage.getAllFriends(userId);
     }
 
-    public Collection<User> getMutualFriends(Long userId, Long otherUserId) {
-        Set<User> otherUserFriends = (Set<User>) (getFriends(otherUserId));
-        otherUserFriends.retainAll(getFriends(userId));
-
-        return otherUserFriends;
+    public Collection<User> getJointFriends(Long userId, Long friend_id) {
+        return userStorage.getJointFriends(userId, friend_id);
     }
 }
 //todo добавить проверку на уникальный email в валидацию в будущем
