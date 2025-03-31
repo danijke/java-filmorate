@@ -70,8 +70,8 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
                 newUser.getEmail(),
                 newUser.getLogin(),
                 newUser.getName(),
-                newUser.getBirthday()
-        );
+                newUser.getBirthday());
+
         if (!saved) {
             throw new NotSavedException("ошибка при обновлении пользователя в БД");
         }
