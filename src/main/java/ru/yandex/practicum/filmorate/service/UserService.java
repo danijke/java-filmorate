@@ -34,14 +34,7 @@ public class UserService {
         if (newUser.getId() == null) {
             throw new ValidationException("Id должен быть указан");
         }
-        get(newUser.getId());
 
-        userStorage.getAll().stream()
-                .filter(user -> user.getEmail().equals(newUser.getEmail()) && !user.getId().equals(newUser.getId()))
-                .findAny()
-                .ifPresent(user -> {
-                    throw new ValidationException(user.getEmail() + " email уже используется");
-                });
 
         return userStorage.update(newUser)
                 .map(oldUser -> {

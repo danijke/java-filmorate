@@ -18,6 +18,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
     @Override
     public Optional<User> saveUser(User user) {
+        checkEmailCollision(user);
         String query = """
                 INSERT INTO users (email, login, user_name, birthday_date)
                 VALUES (?, ?, ?, ?)
@@ -53,7 +54,28 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
     @Override
     public Optional<User> update(User newUser) {
-        return Optional.empty();
+        String q = "SELECT EXISTS(SELECT 1 FROM users WHERE user_id = ?)";
+        if (!exists(q, newUser.getId())) {
+            return Optional.empty();
+        }
+        checkEmailCollision(newUser);
+
+        String query = """
+                UPDATE users SET
+                email = ?, login = ?, user_name = ?, birthday_date = ?
+                WHERE user_id = ?
+                """;
+
+        boolean saved = update(query,
+                newUser.getEmail(),
+                newUser.getLogin(),
+                newUser.getName(),
+                newUser.getBirthday()
+        );
+        if (!saved) {
+            throw new NotSavedException("ошибка при обновлении пользователя в БД");
+        }
+        return Optional.of(newUser);
     }
 
     @Override
@@ -94,4 +116,14 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
         return findMany(q,userId, friendId);
     }
+
+    private void checkEmailCollision(User user) {
+        String q = "SELECT EXISTS(SELECT 1 FROM users WHERE email = ? AND user_id <> ?)";
+        if (exists(q, user.getEmail(), user.getId())) {
+            throw new NotSavedException(
+                    String.format("ошибка при сохранении в бд, email : %s уже используется", user.getEmail()
+                    );
+        }
+    }
+
 }
