@@ -10,15 +10,15 @@ import java.sql.*;
 public class FilmMapper implements RowMapper<Film> {
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Rating mpa = new Rating();
-        mpa.setId(rs.getLong("rating_id"));
         return Film.builder()
                 .id(rs.getLong("film_id"))
                 .name(rs.getString("film_name"))
                 .description(rs.getString("description"))
                 .duration(rs.getInt("duration"))
                 .releaseDate(rs.getDate("releaseDate").toLocalDate())
-                .mpa(mpa)
+                .mpa(Rating.builder()
+                        .id(rs.getLong("rating_id"))
+                        .build())
                 .build();
     }
 }

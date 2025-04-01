@@ -33,4 +33,14 @@ public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage
             ps.setLong(2, genre.getId());
         });
     }
+
+    @Override
+    public Optional<Genre> findGenreById(Long id) {
+        return findOne("SELECT * FROM genres WHERE genre_id = ?", id);
+    }
+
+    @Override
+    public Collection<Genre> getAll() {
+        return findMany("SELECT * FROM genres");
+    }
 }

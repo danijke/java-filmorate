@@ -7,5 +7,5 @@ import java.util.*;
 public interface RatingStorage {
     Optional<Rating> findRatingById(Long id);
 
-    Collection<Rating> findAll();
+    Collection<Rating> getAll();
 }

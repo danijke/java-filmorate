@@ -122,7 +122,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
         if (exists(q, user.getEmail(), user.getId())) {
             throw new NotSavedException(
                     String.format("ошибка при сохранении в бд, email : %s уже используется", user.getEmail()
-                    );
+                    ));
         }
     }
 

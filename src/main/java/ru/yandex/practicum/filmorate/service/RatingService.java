@@ -14,7 +14,7 @@ public class RatingService {
     private final RatingStorage ratingStorage;
 
     public Collection<Rating> getAll() {
-        return ratingStorage.findAll();
+        return ratingStorage.getAll();
     }
 
     public Rating getById(Long id) {

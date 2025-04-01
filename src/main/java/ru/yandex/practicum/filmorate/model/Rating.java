@@ -5,7 +5,7 @@ import lombok.experimental.FieldDefaults;
 
 @Data
 @Builder
-@RequiredArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Rating {
     Long id;
