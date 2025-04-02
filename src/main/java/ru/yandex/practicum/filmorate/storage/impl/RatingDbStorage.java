@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.storage.impl;
 
 import org.springframework.jdbc.core.*;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.storage.RatingStorage;
 
 import java.util.*;
@@ -26,6 +26,6 @@ public class RatingDbStorage extends BaseDbStorage<Rating> implements RatingStor
     @Override
     public boolean isMpaExits(Long id) {
         String q = "SELECT EXISTS(SELECT 1 FROM rating WHERE rating_id = ?)";
-        return exists(q,id);
+        return exists(q, id);
     }
 }

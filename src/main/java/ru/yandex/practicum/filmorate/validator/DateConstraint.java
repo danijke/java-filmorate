@@ -9,7 +9,10 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DateConstraint {
     String message() default "Дата не соответствует требованиям";
+
     String minDate();
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

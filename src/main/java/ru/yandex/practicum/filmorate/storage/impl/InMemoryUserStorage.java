@@ -63,6 +63,11 @@ public class InMemoryUserStorage implements UserStorage {
         return null;
     }
 
+    @Override
+    public boolean containsUserByIds(Long userId, Long friendId) {
+        return false;
+    }
+
     private long getNextId() {
         long currentMaxId = users.keySet()
                 .stream()

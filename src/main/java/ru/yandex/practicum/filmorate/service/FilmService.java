@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.*;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.Collection;
 
@@ -23,29 +23,16 @@ public class FilmService {
     }
 
     public Film create(Film film) {
-        log.trace("запрос на создание фильма : {}", film);
-        ratingService.validateMpaId(film.getMpa().getId());
-        genreService.validateGenres(film.getGenres());
-
+        log.trace("создание фильма: {}", film);
+        validateFilm(film);
         return filmStorage.saveFilm(film)
-                .map(f -> {
-                    log.info("фильм {} успешно добавлен", f.getName());
-                    return f;
-                })
-                .orElseThrow(() -> new NotFoundException("Ошибка при получении сохраненного фильма"));
+                .orElseThrow(() -> new NotFoundException("ошибка при сохранении фильма"));
     }
 
     public Film update(Film newFilm) {
-        if (newFilm.getId() == null) {
-            throw new ValidationException("id должен быть указан");
-        }
-        ratingService.validateMpaId(newFilm.getMpa().getId());
-        genreService.validateGenres(newFilm.getGenres());
+        if (newFilm.getId() == null) throw new ValidationException("id должен быть указан");
+        validateFilm(newFilm);
         return filmStorage.updateFilm(newFilm)
-                .map(film -> {
-                    log.info("фильм {} успешно обновлен", film.getName());
-                    return film;
-                })
                 .orElseThrow(() -> new NotFoundException("фильм с id = " + newFilm.getId() + " не найден"));
     }
 
@@ -55,7 +42,7 @@ public class FilmService {
 
     public void setLike(Long filmId, Long userId) {
         filmStorage.setLike(filmId, userId);
-        log.info("пользователь {} добавил лайк фильму {}", userId, filmId);
+        log.info("пользователь {} лайкнул фильм {}", userId, filmId);
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -64,11 +51,12 @@ public class FilmService {
     }
 
     public Collection<Film> getPopular(int count) {
-        if (count <= 0) {
-            throw new ParameterNotValidException("count", "Некорректный размер выборки. Размер должен быть больше нуля");
-        }
-
+        if (count <= 0) throw new ParameterNotValidException("count", "размер выборки должен быть больше нуля");
         return filmStorage.getPopular(count);
     }
-}
 
+    private void validateFilm(Film film) {
+        ratingService.validateMpaId(film.getMpa().getId());
+        genreService.validateGenres(film.getGenres());
+    }
+}

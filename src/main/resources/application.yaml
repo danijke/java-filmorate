@@ -13,5 +13,5 @@ spring:
     password: password
     driver-class-name: org.h2.Driver
 logging.level:
-    ru.yandex.practicum.filmorate: TRACE
+    ru.yandex.practicum.filmorate: INFO
 logging.level.org.zalando.logbook: TRACE

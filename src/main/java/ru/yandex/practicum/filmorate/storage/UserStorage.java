@@ -22,4 +22,6 @@ public interface UserStorage {
     Collection<User> getAllFriends(Long userId);
 
     Collection<User> getJointFriends(Long userId, Long friendId);
+
+    boolean containsUserByIds(Long userId, Long friendId);
 }

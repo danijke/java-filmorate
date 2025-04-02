@@ -19,31 +19,16 @@ public class UserService {
         if (user.getName() == null) {
             user.setName(user.getLogin());
         }
-
-        return userStorage.saveUser(user)
-                .map(u -> {
-                    log.info("пользователь c логином {} успешно добавлен", user.getLogin());
-                    log.trace("сохранено, пользователь : {}", u);
-                    return u;
-                })
-                .orElseThrow(() -> new NotFoundException(
-                        String.format("Ошибка при получении сохраненного пользователя с логином = %s", user.getLogin())
-                ));
+        return userStorage.saveUser(user).orElseThrow(() ->
+                new NotFoundException("ошибка при сохранении пользователя: " + user.getLogin()));
     }
 
     public User update(User newUser) {
         if (newUser.getId() == null) {
-            throw new ValidationException("Id должен быть указан");
+            throw new ValidationException("id должен быть указан");
         }
-        log.trace("запрос на обновление, пользователь : {}", newUser);
-
-        return userStorage.update(newUser)
-                .map(oldUser -> {
-                    log.info("пользователь c логином {} успешно обновлен", oldUser.getLogin());
-                    log.trace("обновлен, пользователь : {}", oldUser);
-                    return oldUser;
-                })
-                .orElseThrow(() -> new NotFoundException("пользователь с id = " + newUser.getId() + " не найден"));
+        return userStorage.update(newUser).orElseThrow(() ->
+                new NotFoundException("пользователь с id = " + newUser.getId() + " не найден"));
     }
 
     public Collection<User> findAll() {
@@ -52,25 +37,33 @@ public class UserService {
 
     public User get(Long userId) {
         return userStorage.findUserById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден"));
+                .orElseThrow(() -> new NotFoundException("пользователь с id = " + userId + " не найден"));
     }
 
     public void addFriend(Long userId, Long friendId) {
+        checkUsersExist(userId, friendId);
         userStorage.addFriend(userId, friendId);
         log.info("пользователь {} добавил в друзья пользователя {}", userId, friendId);
     }
 
     public void deleteFriend(Long userId, Long friendId) {
+        checkUsersExist(userId, friendId);
         userStorage.deleteFriend(userId, friendId);
         log.info("пользователь {} удалил из друзей пользователя {}", userId, friendId);
     }
 
     public Collection<User> getFriends(Long userId) {
-        return userStorage.getAllFriends(userId);
+        return userStorage.getAllFriends(get(userId).getId());
     }
 
     public Collection<User> getJointFriends(Long userId, Long friendId) {
         return userStorage.getJointFriends(userId, friendId);
+    }
+
+    private void checkUsersExist(Long userId, Long friendId) {
+        if (!userStorage.containsUserByIds(userId, friendId)) {
+            throw new NotFoundException("один или оба пользователя не найдены");
+        }
     }
 }
 //todo добавить проверку на уникальный email в валидацию в будущем

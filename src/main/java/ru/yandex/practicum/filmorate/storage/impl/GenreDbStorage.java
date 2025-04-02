@@ -27,12 +27,12 @@ public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage
     @Override
     public void saveFilmGenres(Long filmId, List<Genre> genres) {
         String query = """
-        INSERT INTO film_genres (film_id, genre_id)
-        SELECT ?, ?
-        WHERE NOT EXISTS (SELECT 1 FROM film_genres
-                          WHERE film_id = ?
-                          AND genre_id = ?);
-        """;
+                INSERT INTO film_genres (film_id, genre_id)
+                SELECT ?, ?
+                WHERE NOT EXISTS (SELECT 1 FROM film_genres
+                                  WHERE film_id = ?
+                                  AND genre_id = ?);
+                """;
 
         saveMany(query, genres, (ps, genre) -> {
             ps.setLong(1, filmId);

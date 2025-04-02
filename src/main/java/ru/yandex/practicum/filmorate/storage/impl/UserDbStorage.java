@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.*;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotSavedException;
-import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
@@ -28,14 +28,14 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
                 user.getLogin(),
                 user.getName(),
                 user.getBirthday()
-                ).map(this::findUserById)
+        ).map(this::findUserById)
                 .orElseThrow(() -> new NotSavedException("ошибка при сохранении пользователя в БД"));
     }
 
     @Override
     public void removeUser(Long id) {
         String q = "DELETE FROM users WHERE user_id = ?";
-        if (update(q,id)) {
+        if (update(q, id)) {
             throw new NotSavedException(
                     String.format("ошибка при удалении пользователя с id = %d", id)
             );
@@ -44,7 +44,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
     @Override
     public Optional<User> findUserById(Long id) {
-        return findOne("SELECT * FROM users WHERE user_id = ?",id);
+        return findOne("SELECT * FROM users WHERE user_id = ?", id);
     }
 
     @Override
@@ -82,12 +82,12 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     @Override
     public boolean addFriend(Long userId, Long friendId) {
         String q = """
-        INSERT INTO user_friends (user_id, friend_id)
-        SELECT ?, ?
-        WHERE NOT EXISTS (SELECT 1 FROM user_friends
-                          WHERE user_id = ?
-                          AND friend_id = ?);
-        """;
+                INSERT INTO user_friends (user_id, friend_id)
+                SELECT ?, ?
+                WHERE NOT EXISTS (SELECT 1 FROM user_friends
+                                  WHERE user_id = ?
+                                  AND friend_id = ?);
+                """;
         return update(q, userId, friendId, userId, friendId);
     }
 
@@ -105,7 +105,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
                 WHERE uf.user_id = ?;
                 """;
 
-        return findMany(q,userId);
+        return findMany(q, userId);
     }
 
     @Override
@@ -117,8 +117,19 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
                 WHERE uf1.user_id = ? AND uf2.user_id = ?;
                 """;
 
-        return findMany(q,userId, friendId);
+        return findMany(q, userId, friendId);
     }
+
+    @Override
+    public boolean containsUserByIds(Long userId, Long friendId) {
+        String q = """
+                SELECT COUNT(*) = 2
+                FROM users
+                WHERE user_id IN (?, ?)
+                """;
+        return exists(q, userId, friendId);
+    }
+
 
     private void checkEmailCollision(User user) {
         String q = "SELECT EXISTS(SELECT 1 FROM users WHERE email = ? AND user_id <> ?)";
