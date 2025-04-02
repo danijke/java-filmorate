@@ -1,19 +1,14 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ru.yandex.practicum.filmorate.validator.DateConstraint;
 
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Stream;
 
 @Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@EqualsAndHashCode(of = {"id"})
 public class User {
     private Long id;
 

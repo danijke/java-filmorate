@@ -5,13 +5,12 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.yandex.practicum.filmorate.validator.DateConstraint;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@EqualsAndHashCode(of = {"id"})
 public class Film {
     Long id;
 

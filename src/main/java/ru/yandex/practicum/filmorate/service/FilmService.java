@@ -4,17 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.*;
-import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.*;
 
-import java.util.*;
+import java.util.Collection;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FilmService {
-    private final UserService userService;
-
+    private final RatingService ratingService;
+    private final GenreService genreService;
     private final FilmStorage filmStorage;
 
     public Film get(Long filmId) {
@@ -23,6 +23,10 @@ public class FilmService {
     }
 
     public Film create(Film film) {
+        log.trace("запрос на создание фильма : {}", film);
+        ratingService.validateMpaId(film.getMpa().getId());
+        genreService.validateGenres(film.getGenres());
+
         return filmStorage.saveFilm(film)
                 .map(f -> {
                     log.info("фильм {} успешно добавлен", f.getName());
@@ -35,7 +39,8 @@ public class FilmService {
         if (newFilm.getId() == null) {
             throw new ValidationException("id должен быть указан");
         }
-
+        ratingService.validateMpaId(newFilm.getMpa().getId());
+        genreService.validateGenres(newFilm.getGenres());
         return filmStorage.updateFilm(newFilm)
                 .map(film -> {
                     log.info("фильм {} успешно обновлен", film.getName());

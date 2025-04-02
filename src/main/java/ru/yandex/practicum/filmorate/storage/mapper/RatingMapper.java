@@ -12,7 +12,7 @@ public class RatingMapper implements RowMapper<Rating> {
     public Rating mapRow(ResultSet rs, int rowNum) throws SQLException {
         return Rating.builder()
                 .id(rs.getLong("rating_id"))
-                .name(rs.getString("genre_name"))
+                .name(rs.getString("rating_name"))
                 .build();
     }
 }

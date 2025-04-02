@@ -22,4 +22,10 @@ public class RatingDbStorage extends BaseDbStorage<Rating> implements RatingStor
     public Collection<Rating> getAll() {
         return findMany("SELECT * FROM rating");
     }
+
+    @Override
+    public boolean isMpaExits(Long id) {
+        String q = "SELECT EXISTS(SELECT 1 FROM rating WHERE rating_id = ?)";
+        return exists(q,id);
+    }
 }

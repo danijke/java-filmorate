@@ -22,7 +22,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleParameterNotValid(final ParameterNotValidException e) {
-        return new ErrorResponse(String.format("Некорректное значение параметра %s: %s",e.getParameter(), e.getReason()));
+        return new ErrorResponse(String.format("Некорректное значение параметра %s: %s", e.getParameter(), e.getReason()));
     }
 }
 //todo добавить обработку ошибок из  @Valid (сообщения из аннотаций user, film)

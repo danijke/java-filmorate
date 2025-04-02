@@ -18,7 +18,7 @@ public class FilmValidationTest extends BaseValidationTest {
         Film film = Film.builder()
                 .id(1L)
                 .name("Valid Name")
-                .description( "A".repeat(200))
+                .description("A".repeat(200))
                 .releaseDate(LocalDate.of(1895, 12, 28))
                 .duration(1)
                 .build();
@@ -33,7 +33,7 @@ public class FilmValidationTest extends BaseValidationTest {
         Film film = Film.builder()
                 .id(0L)
                 .name("")
-                .description( "A".repeat(201))
+                .description("A".repeat(201))
                 .releaseDate(LocalDate.of(1895, 12, 27))
                 .duration(0)
                 .build();

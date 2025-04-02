@@ -11,5 +11,7 @@ public interface GenreStorage {
 
     Optional<Genre> findGenreById(Long id);
 
-    Collection<Genre> getAll();
+    Collection<Genre> findAll();
+
+    Long getGenresCount();
 }

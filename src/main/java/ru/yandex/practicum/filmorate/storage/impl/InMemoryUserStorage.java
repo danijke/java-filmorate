@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
@@ -27,7 +27,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public List<User> getAll() {
+    public List<User> findAll() {
         return users.values().stream().toList();
     }
 

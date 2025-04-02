@@ -7,13 +7,13 @@ import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.*;
+import java.util.Collection;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final  UserStorage userStorage;
+    private final UserStorage userStorage;
 
     public User create(User user) {
         if (user.getName() == null) {
@@ -23,6 +23,7 @@ public class UserService {
         return userStorage.saveUser(user)
                 .map(u -> {
                     log.info("пользователь c логином {} успешно добавлен", user.getLogin());
+                    log.trace("сохранено, пользователь : {}", u);
                     return u;
                 })
                 .orElseThrow(() -> new NotFoundException(
@@ -34,18 +35,19 @@ public class UserService {
         if (newUser.getId() == null) {
             throw new ValidationException("Id должен быть указан");
         }
-
+        log.trace("запрос на обновление, пользователь : {}", newUser);
 
         return userStorage.update(newUser)
                 .map(oldUser -> {
                     log.info("пользователь c логином {} успешно обновлен", oldUser.getLogin());
+                    log.trace("обновлен, пользователь : {}", oldUser);
                     return oldUser;
                 })
                 .orElseThrow(() -> new NotFoundException("пользователь с id = " + newUser.getId() + " не найден"));
     }
 
     public Collection<User> findAll() {
-        return userStorage.getAll();
+        return userStorage.findAll();
     }
 
     public User get(Long userId) {
@@ -67,8 +69,8 @@ public class UserService {
         return userStorage.getAllFriends(userId);
     }
 
-    public Collection<User> getJointFriends(Long userId, Long friend_id) {
-        return userStorage.getJointFriends(userId, friend_id);
+    public Collection<User> getJointFriends(Long userId, Long friendId) {
+        return userStorage.getJointFriends(userId, friendId);
     }
 }
 //todo добавить проверку на уникальный email в валидацию в будущем

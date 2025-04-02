@@ -35,7 +35,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     @Override
     public void removeUser(Long id) {
         String q = "DELETE FROM users WHERE user_id = ?";
-        if(update(q,id)) {
+        if (update(q,id)) {
             throw new NotSavedException(
                     String.format("ошибка при удалении пользователя с id = %d", id)
             );
@@ -48,7 +48,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     }
 
     @Override
-    public Collection<User> getAll() {
+    public Collection<User> findAll() {
         return findMany("SELECT * FROM users");
     }
 
@@ -70,7 +70,8 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
                 newUser.getEmail(),
                 newUser.getLogin(),
                 newUser.getName(),
-                newUser.getBirthday());
+                newUser.getBirthday(),
+                newUser.getId());
 
         if (!saved) {
             throw new NotSavedException("ошибка при обновлении пользователя в БД");
