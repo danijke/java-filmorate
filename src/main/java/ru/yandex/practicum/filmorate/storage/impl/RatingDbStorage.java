@@ -20,7 +20,7 @@ public class RatingDbStorage extends BaseDbStorage<Rating> implements RatingStor
 
     @Override
     public Collection<Rating> getAll() {
-        return findMany("SELECT * FROM rating");
+        return findMany("SELECT * FROM rating ORDER BY rating_id");
     }
 
     @Override

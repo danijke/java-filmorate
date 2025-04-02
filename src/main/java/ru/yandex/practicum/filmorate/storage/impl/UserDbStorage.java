@@ -82,11 +82,13 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     @Override
     public boolean addFriend(Long userId, Long friendId) {
         String q = """
-                INSERT INTO user_friends (user_id, friend_id)
-                VALUES (?, ?)
-                ON CONFLICT DO NOTHING;
-                """;
-        return update(q, userId, friendId);
+        INSERT INTO user_friends (user_id, friend_id)
+        SELECT ?, ?
+        WHERE NOT EXISTS (SELECT 1 FROM user_friends
+                          WHERE user_id = ?
+                          AND friend_id = ?);
+        """;
+        return update(q, userId, friendId, userId, friendId);
     }
 
     @Override

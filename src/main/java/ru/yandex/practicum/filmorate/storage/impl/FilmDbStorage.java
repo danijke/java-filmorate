@@ -37,7 +37,9 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 film.getDuration(),
                 film.getReleaseDate()
         ).map(filmId -> {
-            genreStorage.saveFilmGenres(filmId, film.getGenres());
+            if (film.getGenres() != null) {
+                genreStorage.saveFilmGenres(filmId, film.getGenres());
+            }
             return findFilmById(filmId);
         }).orElseThrow(() -> new NotSavedException("ошибка при сохранении фильма в БД"));
     }

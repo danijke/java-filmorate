@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS films (
     release_date DATE
 );
 
-CREATE TABLE IF NOT EXISTS users_friends (
+CREATE TABLE IF NOT EXISTS user_friends (
     user_id BIGINT REFERENCES users(user_id) ON DELETE CASCADE,
     friend_id BIGINT REFERENCES users(user_id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, friend_id)
