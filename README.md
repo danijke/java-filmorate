@@ -4,12 +4,11 @@
 * film_id [PK] - id фильма
 * name - название фильма
 * description - описание фильма
-* genre [FK] - id жанра
 * rating [FK] - id рейтинга фильма
 * duration - длительность фильма
 * release_date - дата выхода фильма
 
-### film_likes - хранит данные о лайках фильма
+### film_likes - хранит данные о лайках пользователей у фильма
 * film_id [PK] - id фильма
 * user_id [PK] - id юзера
 
@@ -17,49 +16,44 @@
 * genre_id [PK] - id рейтинга
 * name - название рейтинга
 
-### film_genre - хранит данные о жанрах 
+### film_genres - хранит данные о жанрах 
 * film_id [PK] - id фильма
 * genre_id [PK] - id жанра
 
-### genre - хранит данные видах жанров
+### genres - хранит данные видах жанров
 * genre_id [PK] - id жанра
 * name - название жанра
 
-### user - хранит данные о юзерах
+### users - хранит данные о юзерах
 * user_id [PK] - id юзера
 * email - email юзера
 * login - логин юзера
 * name - имя юзера
-* birhday_date - дата рождения юзера
+* birthday_date - дата рождения юзера
 
-### user_friends - хранит данные о друзьях юзера
+### user_friends - хранит данные о друзьях пользователя
 * user_id [PK] - id юзера
 * user_friend_id [PK] - id юзера друга
 * friend_status [FK] - id статуса друга
 
-### friend_status - хранит данные о статусе друга
-* friend_status_id [PK] - id статуса друга
-* status_name - наименование статуса друга
-
 ## Примеры запросов
 ### Запрос на вывод 10 самых популярных фильмов(по лайкам)
 ```sql
-SELECT f.name
-FROM film f
-JOIN (
-    SELECT fl.film_id
-    FROM film_likes fl
-    GROUP BY fl.film_id
-    ORDER BY COUNT(fl.user_id) DESC
-    LIMIT 10
-) top_films ON f.film_id = top_films.film_id;
+SELECT f.*,
+       r.*,
+       COUNT(user_id) likes
+FROM user_film_likes ufl
+JOIN films f ON ufl.film_id = f.film_id
+JOIN rating r ON f.rating_id = r.rating_id
+GROUP BY ufl.film_id
+ORDER BY likes DESC
+LIMIT ?
 ```
-### Запрос на вывод всех подтвержденных друзей пользователя по логину
+### Запрос на вывод общих друзей
 ```sql
-SELECT u.name
-FROM user_friends uf
-JOIN user u ON u.user_id = uf.user_friend_id
-JOIN friend_status fs ON uf.friend_status = fs.friend_status_id
-WHERE uf.user_id = (SELECT user_id FROM user WHERE login = 'danijke')
-  AND fs.status_name = 'confirmed';
+SELECT u.* 
+FROM users u
+JOIN user_friends uf1 ON u.user_id = uf1.friend_id
+JOIN user_friends uf2 ON uf1.friend_id = uf2.friend_id
+WHERE uf1.user_id = ? AND uf2.user_id = ?;
 ```
