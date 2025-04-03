@@ -1,6 +1,6 @@
 # java-filmorate
-## Структура [баз данных](https://github.com/danijke/java-filmorate/blob/sql_diagram/diagram_filmorate.jpg) -> [MIRO](https://miro.com/app/board/uXjVIQMs0_4=/?share_link_id=137127835375)
-### film - хранит данные о фильме
+## Структура [баз данных](https://github.com/danijke/java-filmorate/blob/add-database/diagram_filmorate.jpg) -> [MIRO](https://miro.com/app/board/uXjVIQMs0_4=/?share_link_id=137127835375)
+### films - хранит данные о фильме
 * film_id [PK] - id фильма
 * name - название фильма
 * description - описание фильма
@@ -9,16 +9,16 @@
 * release_date - дата выхода фильма
 
 ### film_likes - хранит данные о лайках пользователей у фильма
-* film_id [PK] - id фильма
-* user_id [PK] - id юзера
+* film_id [FK] - id фильма
+* user_id [FK] - id юзера
 
 ### rating - хранит данные о рейтингах
-* genre_id [PK] - id рейтинга
+* rating_id [PK] - id рейтинга
 * name - название рейтинга
 
 ### film_genres - хранит данные о жанрах 
-* film_id [PK] - id фильма
-* genre_id [PK] - id жанра
+* film_id [FK] - id фильма
+* genre_id [FK] - id жанра
 
 ### genres - хранит данные видах жанров
 * genre_id [PK] - id жанра
@@ -32,9 +32,8 @@
 * birthday_date - дата рождения юзера
 
 ### user_friends - хранит данные о друзьях пользователя
-* user_id [PK] - id юзера
-* user_friend_id [PK] - id юзера друга
-* friend_status [FK] - id статуса друга
+* user_id [FK] - id юзера
+* user_friend_id [FK] - id юзера друга
 
 ## Примеры запросов
 ### Запрос на вывод 10 самых популярных фильмов(по лайкам)
