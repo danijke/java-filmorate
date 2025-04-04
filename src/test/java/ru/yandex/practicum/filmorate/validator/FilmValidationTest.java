@@ -15,7 +15,13 @@ public class FilmValidationTest extends BaseValidationTest {
     @Test
     @DisplayName("должен пройти валидацию")
     void shouldPassWithValidFilm() {
-        Film film = new Film(0L,"Valid Name",  "A".repeat(200), LocalDate.of(1895, 12, 28),1);
+        Film film = Film.builder()
+                .id(1L)
+                .name("Valid Name")
+                .description("A".repeat(200))
+                .releaseDate(LocalDate.of(1895, 12, 28))
+                .duration(1)
+                .build();
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertThat(violations).isEmpty();
@@ -24,7 +30,13 @@ public class FilmValidationTest extends BaseValidationTest {
     @Test
     @DisplayName("должен провалить валидацию")
     void shouldFailWithNotValidFilm() {
-        Film film = new Film(0L,"",  "A".repeat(201), LocalDate.of(1895, 12, 27),0);
+        Film film = Film.builder()
+                .id(0L)
+                .name("")
+                .description("A".repeat(201))
+                .releaseDate(LocalDate.of(1895, 12, 27))
+                .duration(0)
+                .build();
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertThat(violations).hasSize(4);
