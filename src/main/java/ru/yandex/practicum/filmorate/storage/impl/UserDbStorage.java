@@ -35,7 +35,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     @Override
     public void removeUser(Long id) {
         String q = "DELETE FROM users WHERE user_id = ?";
-        if (update(q, id)) {
+        if (!update(q, id)) {
             throw new NotSavedException(
                     String.format("ошибка при удалении пользователя с id = %d", id)
             );
