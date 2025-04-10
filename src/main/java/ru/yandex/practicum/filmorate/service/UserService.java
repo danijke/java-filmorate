@@ -31,6 +31,10 @@ public class UserService {
                 new NotFoundException("пользователь с id = " + newUser.getId() + " не найден"));
     }
 
+    public void delete(Long userId) {
+        userStorage.removeUser(userId);
+    }
+
     public Collection<User> findAll() {
         return userStorage.findAll();
     }

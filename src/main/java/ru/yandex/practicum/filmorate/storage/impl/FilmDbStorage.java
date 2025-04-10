@@ -47,7 +47,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public void removeFilm(Long id) {
         String q = "DELETE FROM films WHERE film_id = ?";
-        if (update(q, id)) {
+        if (!update(q, id)) {
             throw new NotSavedException(
                     String.format("ошибка при удалении фильма с id = %d", id)
             );

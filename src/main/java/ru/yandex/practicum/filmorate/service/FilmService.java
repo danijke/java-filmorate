@@ -36,6 +36,10 @@ public class FilmService {
                 .orElseThrow(() -> new NotFoundException("фильм с id = " + newFilm.getId() + " не найден"));
     }
 
+    public void delete(Long filmId) {
+        filmStorage.removeFilm(filmId);
+    }
+
     public Collection<Film> findAll() {
         return filmStorage.getFilms();
     }
