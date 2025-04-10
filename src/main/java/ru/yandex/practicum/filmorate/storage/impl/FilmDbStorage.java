@@ -98,19 +98,11 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public Collection<Film> getPopular(int count) {
         String query = """
-                SELECT f.film_id,
-                       f.film_name,
-                       f.description,
-                       r.rating_id,
-                       r.rating_name,
-                       f.duration,
-                       f.release_date,
-                       COUNT(user_id) likes
+                SELECT f.*, COUNT(ufl.user_id) AS likes
                 FROM user_film_likes ufl
-                JOIN films f ON ufl.film_id = f.film_id
-                JOIN rating r ON f.rating_id = r.rating_id
-                GROUP BY ufl.film_id
-                ORDER BY likes DESC
+                RIGHT JOIN films f ON ufl.film_id = f.film_id
+                GROUP BY f.film_id
+                ORDER BY likes DESC NULLS LAST
                 LIMIT ?
                 """;
         return findMany(query, count);
