@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import java.util.Collection;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -54,9 +54,13 @@ public class FilmService {
         log.info("пользователь {} удалил лайк у фильма {}", userId, filmId);
     }
 
-    public Collection<Film> getPopular(int count) {
+    public Collection<Film> getPopular(int count, Long genreId, Integer year) {
         if (count <= 0) throw new ParameterNotValidException("count", "размер выборки должен быть больше нуля");
-        return filmStorage.getPopular(count);
+        return filmStorage.getPopular(count).stream()
+                .filter(film -> genreId == null || film.getGenres().stream()
+                        .anyMatch(genre -> Objects.equals(genre.getId(), genreId)))
+                .filter(film -> year == null || film.getReleaseDate().getYear() == year)
+                .toList();
     }
 
     private void validateFilm(Film film) {

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
+import java.time.LocalDate;
 import java.util.Collection;
 
 @RestController
@@ -25,8 +26,12 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> getByPopularity(@RequestParam(defaultValue = "10") int count) {
-        return filmService.getPopular(count);
+    public Collection<Film> getPopular(
+            @RequestParam(defaultValue = "10") int count,
+            @RequestParam(required = false) Long genreId,
+            @RequestParam(required = false) Integer year
+    ) {
+        return filmService.getPopular(count, genreId, year);
     }
 
     @PostMapping

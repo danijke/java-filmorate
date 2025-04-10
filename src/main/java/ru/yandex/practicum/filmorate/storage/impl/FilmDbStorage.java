@@ -105,7 +105,9 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 ORDER BY likes DESC NULLS LAST
                 LIMIT ?
                 """;
-        return findMany(query, count);
+        return findMany(query, count).stream()
+                .map(this::setFilmEntity)
+                .toList();
     }
 
     @Override
