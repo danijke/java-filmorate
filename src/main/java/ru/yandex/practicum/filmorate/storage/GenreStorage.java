@@ -9,6 +9,10 @@ public interface GenreStorage {
 
     void saveFilmGenres(Long filmId, List<Genre> genres);
 
+    void removeFilmGenres(Long filmId);
+
+    void updateFilmGenres(Long filmId, List<Genre> genres);
+
     Optional<Genre> findGenreById(Long id);
 
     Collection<Genre> findAll();
