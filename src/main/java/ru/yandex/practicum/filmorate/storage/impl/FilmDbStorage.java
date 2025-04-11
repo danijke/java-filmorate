@@ -98,7 +98,6 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         if (!saved) throw new NotSavedException("ошибка при обновлении фильма в БД");
 
         genreStorage.updateFilmGenres(newFilm.getId(), newFilm.getGenres());
-      
         if (newFilm.getDirectors() != null) {
             directorStorage.updateFilmDirectors(newFilm.getId(), newFilm.getDirectors());
         }
