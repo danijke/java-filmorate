@@ -7,6 +7,8 @@ import ru.yandex.practicum.filmorate.validator.DateConstraint;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
+
 
 @Data
 @Builder
@@ -22,6 +24,8 @@ public class Film {
 
     List<Genre> genres;
 
+    Set<Director> directors;
+    @NotNull(message = "У фильма должен быть указан рейтинг MPA")
     Rating mpa;
 
     @NotNull

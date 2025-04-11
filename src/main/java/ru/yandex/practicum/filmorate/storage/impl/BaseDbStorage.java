@@ -39,7 +39,7 @@ public class BaseDbStorage<T> {
         return Optional.ofNullable(keyHolder.getKeyAs(Long.class));
     }
 
-    protected void saveMany(String query, List<T> entities, ParameterizedPreparedStatementSetter<T> setter) {
+    protected void saveMany(String query, Collection<T> entities, ParameterizedPreparedStatementSetter<T> setter) {
         jdbc.batchUpdate(query, entities, entities.size(), setter);
     }
 
