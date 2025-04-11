@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.impl;
 
 import org.springframework.jdbc.core.*;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.NotSavedException;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
@@ -46,11 +45,7 @@ public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage
     @Override
     public void removeFilmGenres(Long filmId) {
         String q = "DELETE FROM film_genres WHERE film_id = ?";
-        if (!update(q, filmId)) {
-            throw new NotSavedException(
-                    String.format("ошибка при удалении жанров фильма с id = %d", filmId)
-            );
-        }
+        update(q, filmId);
     }
 
     @Override
