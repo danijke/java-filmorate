@@ -20,4 +20,6 @@ public interface FilmStorage {
     void setLike(Long filmId, Long userId);
 
     void deleteLike(Long filmId, Long userId);
+
+    Collection<Film> getSortFilms(Long directorId, String sortBy);
 }
