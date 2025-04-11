@@ -1,8 +1,7 @@
 package ru.yandex.practicum.filmorate.config;
 
-import org.zalando.logbook.*;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
+import org.zalando.logbook.Logbook;
 
 @Configuration
 public class LogbookConfig {
