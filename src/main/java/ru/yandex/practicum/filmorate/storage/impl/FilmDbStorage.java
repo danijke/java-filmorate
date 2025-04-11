@@ -14,14 +14,17 @@ import java.util.*;
 public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     GenreStorage genreStorage;
     RatingStorage ratingStorage;
+    DirectorStorage directorStorage;
 
     public FilmDbStorage(JdbcTemplate jdbc,
                          RowMapper<Film> mapper,
                          GenreStorage genreStorage,
-                         RatingStorage ratingStorage) {
+                         RatingStorage ratingStorage,
+                         DirectorStorage directorStorage) {
         super(jdbc, mapper);
         this.genreStorage = genreStorage;
         this.ratingStorage = ratingStorage;
+        this.directorStorage = directorStorage;
     }
 
     @Override
@@ -39,6 +42,9 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         ).map(filmId -> {
             if (film.getGenres() != null) {
                 genreStorage.saveFilmGenres(filmId, film.getGenres());
+            }
+            if (film.getDirectors() != null) {
+                directorStorage.saveFilmDirectors(filmId, film.getDirectors());
             }
             return findFilmById(filmId);
         }).orElseThrow(() -> new NotSavedException("ошибка при сохранении фильма в БД"));
@@ -92,6 +98,10 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         if (!saved) throw new NotSavedException("ошибка при обновлении фильма в БД");
 
         genreStorage.updateFilmGenres(newFilm.getId(), newFilm.getGenres());
+      
+        if (newFilm.getDirectors() != null) {
+            directorStorage.updateFilmDirectors(newFilm.getId(), newFilm.getDirectors());
+        }
 
         return Optional.of(newFilm);
     }
@@ -131,10 +141,36 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         }
     }
 
+    @Override
+    public Collection<Film> getSortFilms(Long directorId, String sortBy) {
+        String query = """
+                SELECT f.*
+                FROM films f
+                JOIN films_directors fd ON f.film_id = fd.film_id
+                """;
+
+        query = switch (sortBy) {
+            case "year" -> query + "WHERE fd.director_id = ? " + "ORDER BY f.release_date ASC";
+            case "likes" -> query + """
+                    LEFT JOIN user_film_likes ufl on f.film_id = ufl.film_id
+                    WHERE fd.director_id = ?
+                    GROUP BY f.film_id
+                    ORDER BY COUNT(ufl.film_id) DESC
+                    """;
+            default -> throw new ValidationException("Invalid sort parameter");
+        };
+
+         return findMany(query, directorId)
+                 .stream()
+                 .map(this::setFilmEntity)
+                 .toList();
+    }
+
     private Film setFilmEntity(Film film) {
         film.setMpa(ratingStorage.findRatingById(film.getMpa().getId())
                 .orElseThrow(() -> new NotFoundException("mpa рейтинг не найден для фильма с id: " + film.getId())));
         film.setGenres(new ArrayList<>(genreStorage.findGenresByFilmId(film)));
+        film.setDirectors(new HashSet<>(directorStorage.findDirectorsByFilmId(film)));
         return film;
     }
 }

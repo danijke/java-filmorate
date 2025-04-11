@@ -63,4 +63,10 @@ public class FilmController {
     ) {
         filmService.deleteLike(filmId, userId);
     }
+
+    @GetMapping("/director/{directorId}")
+    public Collection<Film> getDirectorsFilms(@PathVariable Long directorId,
+                                              @RequestParam(defaultValue = "year") String sortBy) {
+        return filmService.getDirectorsFilms(directorId, sortBy);
+    }
 }

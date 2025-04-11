@@ -15,6 +15,7 @@ import java.util.*;
 public class FilmService {
     private final RatingService ratingService;
     private final GenreService genreService;
+    private final DirectorService directorService;
     private final FilmStorage filmStorage;
 
     public Film get(Long filmId) {
@@ -63,8 +64,14 @@ public class FilmService {
                 .toList();
     }
 
+    public Collection<Film> getDirectorsFilms(Long directorId, String sortBy) {
+        return filmStorage.getSortFilms(directorId, sortBy);
+
+    }
+
     private void validateFilm(Film film) {
         ratingService.validateMpaId(film.getMpa().getId());
         genreService.validateGenres(film.getGenres());
+        directorService.validateDirectors(film.getDirectors());
     }
 }
