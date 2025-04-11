@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.storage.RatingStorage;
 
@@ -27,7 +26,7 @@ public class RatingService {
 
     public void validateMpaId(Long id) {
         if (!ratingStorage.isMpaExits(id)) {
-            throw new ValidationException(
+            throw new NotFoundException(
                     String.format("нет в бд mpa id : %d", id)
             );
         }
