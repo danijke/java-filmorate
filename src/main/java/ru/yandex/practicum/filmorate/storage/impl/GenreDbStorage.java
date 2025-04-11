@@ -43,6 +43,18 @@ public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage
     }
 
     @Override
+    public void removeFilmGenres(Long filmId) {
+        String q = "DELETE FROM film_genres WHERE film_id = ?";
+        update(q, filmId);
+    }
+
+    @Override
+    public void updateFilmGenres(Long filmId, List<Genre> genres) {
+        removeFilmGenres(filmId);
+        if (genres != null) saveFilmGenres(filmId, genres);
+    }
+
+    @Override
     public Optional<Genre> findGenreById(Long id) {
         return findOne("SELECT * FROM genres WHERE genre_id = ?", id);
     }

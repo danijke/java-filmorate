@@ -53,11 +53,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public void removeFilm(Long id) {
         String q = "DELETE FROM films WHERE film_id = ?";
-        if (!update(q, id)) {
-            throw new NotSavedException(
-                    String.format("ошибка при удалении фильма с id = %d", id)
-            );
-        }
+        update(q, id);
     }
 
     @Override
@@ -95,12 +91,13 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 newFilm.getReleaseDate(),
                 newFilm.getId());
 
-        if (!saved) {
-            throw new NotSavedException("ошибка при обновлении фильма в БД");
-        }
+        if (!saved) throw new NotSavedException("ошибка при обновлении фильма в БД");
+
+        genreStorage.updateFilmGenres(newFilm.getId(), newFilm.getGenres());
         if (newFilm.getDirectors() != null) {
             directorStorage.updateFilmDirectors(newFilm.getId(), newFilm.getDirectors());
         }
+
         return Optional.of(newFilm);
     }
 
@@ -114,7 +111,9 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 ORDER BY likes DESC NULLS LAST
                 LIMIT ?
                 """;
-        return findMany(query, count);
+        return findMany(query, count).stream()
+                .map(this::setFilmEntity)
+                .toList();
     }
 
     @Override
@@ -130,11 +129,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public void deleteLike(Long filmId, Long userId) {
         String query = "DELETE FROM user_film_likes WHERE film_id = ? AND user_id = ?";
-        if (!update(query, filmId, userId)) {
-            throw new NotSavedException(
-                    String.format("ошибка при удалении лайка пользователя %s у фильма %s", userId, filmId
-                    ));
-        }
+        update(query, filmId, userId);
     }
 
     @Override
@@ -156,10 +151,10 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             default -> throw new ValidationException("Invalid sort parameter");
         };
 
-         return findMany(query, directorId)
-                 .stream()
-                 .map(this::setFilmEntity)
-                 .toList();
+        return findMany(query, directorId)
+                .stream()
+                .map(this::setFilmEntity)
+                .toList();
     }
 
     private Film setFilmEntity(Film film) {

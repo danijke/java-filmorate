@@ -1,18 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
 import org.springframework.context.annotation.Primary;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.*;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotSavedException;
-import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 @Primary
@@ -36,11 +31,7 @@ public class DirectorDbStorage extends BaseDbStorage<Director> implements Direct
     @Override
     public void removeDirector(Long id) {
         String query = "DELETE FROM directors WHERE director_id = ?";
-        if (!update(query, id)) {
-            throw new NotSavedException(
-                    String.format("Ошибка при удалении режиссера с id = %d", id)
-            );
-        }
+        update(query, id);
     }
 
     @Override
