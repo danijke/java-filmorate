@@ -24,4 +24,6 @@ public class Review {
     @NotNull
     @Positive
     Long filmId;
+
+    int rating;
 }
