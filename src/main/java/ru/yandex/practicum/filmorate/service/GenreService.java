@@ -24,7 +24,6 @@ public class GenreService {
         return genreStorage.findAll();
     }
 
-
     public void validateGenres(List<Genre> genres) {
         if (genres != null) {
             genres.stream()
