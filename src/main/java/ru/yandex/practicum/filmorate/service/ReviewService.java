@@ -21,8 +21,7 @@ public class ReviewService {
         validateReviewEntity(review);
         return reviewStorage.saveReview(review)
                 .orElseThrow(
-                        () -> new NotFoundException("ошибка при получении сохраненного отзыва из бд")
-                );
+                        () -> new NotFoundException("ошибка при получении сохраненного отзыва из бд"));
     }
 
     public Review update(Review review) {
