@@ -60,29 +60,17 @@ CREATE TABLE IF NOT EXISTS reviews (
     is_positive BOOLEAN,
     user_id BIGINT REFERENCES users(user_id) ON DELETE CASCADE,
     film_id BIGINT REFERENCES films(film_id) ON DELETE CASCADE,
-    rating INTEGER DEFAULT 0
+    useful INTEGER DEFAULT 0
 );
 
-CREATE TABLE IF NOT EXISTS review_rating (
+CREATE TABLE IF NOT EXISTS review_useful (
     review_id BIGINT REFERENCES reviews(review_id) ON DELETE CASCADE,
     user_id BIGINT REFERENCES users(user_id) ON DELETE CASCADE,
-    liked BOOLEAN,
+    useful BOOLEAN,
     PRIMARY KEY (review_id, user_id)
 );
 
-CREATE TRIGGER update_review_rating
-AFTER INSERT, DELETE ON review_rating
-FOR EACH ROW
-BEGIN
-    UPDATE reviews
-    SET rating = (
-        SELECT
-            COALESCE(SUM(CASE WHEN liked = 1 THEN 1 ELSE -1 END), 0)
-        FROM review_rating
-        WHERE review_id = IFNULL(NEW.review_id, OLD.review_id)
-    )
-    WHERE review_id = IFNULL(NEW.review_id, OLD.review_id);
-END;
+
 
 
 
