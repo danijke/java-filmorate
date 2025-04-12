@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.*;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotSavedException;
@@ -10,7 +9,6 @@ import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import java.util.*;
 
 @Repository
-@Primary
 public class DirectorDbStorage extends BaseDbStorage<Director> implements DirectorStorage {
 
     public DirectorDbStorage(JdbcTemplate jdbc, RowMapper<Director> mapper) {
@@ -93,7 +91,7 @@ public class DirectorDbStorage extends BaseDbStorage<Director> implements Direct
     @Override
     public void updateFilmDirectors(Long filmId, Set<Director> directors) {
         update("DELETE FROM films_directors WHERE film_id = ?", filmId);
-        saveFilmDirectors(filmId, directors);
+        if (directors != null) saveFilmDirectors(filmId, directors);
     }
 
     @Override
