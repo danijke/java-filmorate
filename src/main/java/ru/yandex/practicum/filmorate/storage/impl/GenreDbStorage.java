@@ -1,13 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
 import org.springframework.jdbc.core.*;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.util.*;
 
-@Component
+@Repository
 public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage {
     public GenreDbStorage(JdbcTemplate jdbc, RowMapper<Genre> mapper) {
         super(jdbc, mapper);

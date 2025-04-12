@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.Collection;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -20,7 +20,7 @@ public class UserService {
             user.setName(user.getLogin());
         }
         return userStorage.saveUser(user).orElseThrow(() ->
-                new NotFoundException("ошибка при сохранении пользователя: " + user.getLogin()));
+                new NotFoundException("ошибка при получении сохраненного пользователя из бд: " + user.getLogin()));
     }
 
     public User update(User newUser) {
@@ -64,9 +64,11 @@ public class UserService {
         return userStorage.getJointFriends(userId, friendId);
     }
 
-    private void checkUsersExist(Long userId, Long friendId) {
-        if (!userStorage.containsUserByIds(userId, friendId)) {
-            throw new NotFoundException("один или оба пользователя не найдены");
+    public void checkUsersExist(Long... userIds) {
+        if (!userStorage.containsUsersByIds(userIds)) {
+            throw new NotFoundException(
+                    String.format("пользователи c id : %s не найдены", Arrays.toString(userIds))
+            );
         }
     }
 }

@@ -24,7 +24,7 @@ public class DirectorService {
     public Director create(Director director) {
         log.trace("Добавление режиссераа: {}", director);
         return directorStorage.saveDirector(director)
-                .orElseThrow(() -> new NotFoundException("Ошибка при сохранении режиссера"));
+                .orElseThrow(() -> new NotFoundException("Ошибка при получении сохраненного режиссера из бд"));
     }
 
     public Director update(Director newDirector) {

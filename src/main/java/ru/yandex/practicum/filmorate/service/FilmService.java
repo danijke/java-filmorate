@@ -24,15 +24,14 @@ public class FilmService {
     }
 
     public Film create(Film film) {
-        log.trace("создание фильма: {}", film);
-        validateFilm(film);
+        validateFilmEntity(film);
         return filmStorage.saveFilm(film)
-                .orElseThrow(() -> new NotFoundException("ошибка при сохранении фильма"));
+                .orElseThrow(() -> new NotFoundException("ошибка при получении сохраненного фильма из бд"));
     }
 
     public Film update(Film newFilm) {
         if (newFilm.getId() == null) throw new ValidationException("id должен быть указан");
-        validateFilm(newFilm);
+        validateFilmEntity(newFilm);
         return filmStorage.updateFilm(newFilm)
                 .orElseThrow(() -> new NotFoundException("фильм с id = " + newFilm.getId() + " не найден"));
     }
@@ -47,19 +46,17 @@ public class FilmService {
 
     public void setLike(Long filmId, Long userId) {
         filmStorage.setLike(filmId, userId);
-        log.info("пользователь {} лайкнул фильм {}", userId, filmId);
     }
 
     public void deleteLike(Long filmId, Long userId) {
         filmStorage.deleteLike(filmId, userId);
-        log.info("пользователь {} удалил лайк у фильма {}", userId, filmId);
     }
 
     public Collection<Film> getPopular(int count, Long genreId, Integer year) {
         if (count <= 0) throw new ParameterNotValidException("count", "размер выборки должен быть больше нуля");
         return filmStorage.getPopular(count).stream()
                 .filter(film -> genreId == null || film.getGenres().stream()
-                        .anyMatch(genre -> Objects.equals(genre.getId(), genreId)))
+                        .anyMatch(genre -> genre.getId().equals(genreId)))
                 .filter(film -> year == null || film.getReleaseDate().getYear() == year)
                 .toList();
     }
