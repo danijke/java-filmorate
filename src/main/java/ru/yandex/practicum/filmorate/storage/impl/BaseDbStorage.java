@@ -52,4 +52,11 @@ public class BaseDbStorage<T> {
                 .orElse(false);
     }
 
+    protected boolean existsMany(String q, Object... params) {
+        if (params == null || params.length == 0) return false;
+
+        String placeholders = String.join(",", Collections.nCopies(params.length, "?"));
+        return exists(String.format(q, params.length, placeholders), params);
+    }
+
 }

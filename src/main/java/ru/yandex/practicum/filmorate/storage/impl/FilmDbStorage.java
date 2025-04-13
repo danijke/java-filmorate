@@ -1,16 +1,14 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.*;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.util.*;
 
-@Component
-@Primary
+@Repository
 public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     GenreStorage genreStorage;
     RatingStorage ratingStorage;
@@ -94,9 +92,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         if (!saved) throw new NotSavedException("ошибка при обновлении фильма в БД");
 
         genreStorage.updateFilmGenres(newFilm.getId(), newFilm.getGenres());
-        if (newFilm.getDirectors() != null) {
-            directorStorage.updateFilmDirectors(newFilm.getId(), newFilm.getDirectors());
-        }
+        directorStorage.updateFilmDirectors(newFilm.getId(), newFilm.getDirectors());
 
         return Optional.of(newFilm);
     }
@@ -155,6 +151,16 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 .stream()
                 .map(this::setFilmEntity)
                 .toList();
+    }
+
+    @Override
+    public boolean containsFilmsByIds(Long... filmIds) {
+        String q = """
+                SELECT COUNT(*) = %d
+                FROM films
+                WHERE film_id IN (%s)
+                """;
+        return existsMany(q, (Object[]) filmIds);
     }
 
     private Film setFilmEntity(Film film) {
