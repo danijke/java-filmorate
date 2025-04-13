@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
@@ -190,9 +191,26 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
     @Override
-    public int getLikesCount(Long filmId) {
-        String sql = "SELECT COUNT(*) FROM user_film_likes WHERE film_id = ?";
-        return jdbc.queryForObject(sql, Integer.class, filmId);
-    }
+    public Map<Long, Integer> getLikesCountForFilms(Collection<Long> filmIds) {
+        if (filmIds.isEmpty()) return Collections.emptyMap();
 
+        String inSql = filmIds.stream()
+                .map(id -> "?")
+                .collect(Collectors.joining(", "));
+
+        String sql = String.format("""
+        SELECT film_id, COUNT(user_id) AS likes
+        FROM user_film_likes
+        WHERE film_id IN (%s)
+        GROUP BY film_id
+    """, inSql);
+
+        return jdbc.query(sql, filmIds.toArray(), rs -> {
+            Map<Long, Integer> result = new HashMap<>();
+            while (rs.next()) {
+                result.put(rs.getLong("film_id"), rs.getInt("likes"));
+            }
+            return result;
+        });
+    }
 }

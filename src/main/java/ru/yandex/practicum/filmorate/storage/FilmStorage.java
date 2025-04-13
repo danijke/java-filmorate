@@ -29,5 +29,5 @@ public interface FilmStorage {
 
     Collection<Film> getFilmsLikedByUser(Long userId);
 
-    int getLikesCount(Long filmId);
+    Map<Long, Integer> getLikesCountForFilms(Collection<Long> filmIds);
 }
