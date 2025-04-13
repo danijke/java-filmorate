@@ -175,4 +175,24 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         film.setDirectors(new HashSet<>(directorStorage.findDirectorsByFilmId(film)));
         return film;
     }
+
+    @Override
+    public Collection<Film> getFilmsLikedByUser(Long userId) {
+        String sql = """
+        SELECT f.*
+        FROM films f
+        JOIN user_film_likes ufl ON f.film_id = ufl.film_id
+        WHERE ufl.user_id = ?
+        """;
+        return findMany(sql, userId).stream()
+                .map(this::setFilmEntity)
+                .toList();
+    }
+
+    @Override
+    public int getLikesCount(Long filmId) {
+        String sql = "SELECT COUNT(*) FROM user_film_likes WHERE film_id = ?";
+        return jdbc.queryForObject(sql, Integer.class, filmId);
+    }
+
 }

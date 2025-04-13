@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -78,5 +79,19 @@ public class FilmService {
         ratingService.validateMpaId(film.getMpa().getId());
         genreService.validateGenres(film.getGenres());
         directorService.validateDirectors(film.getDirectors());
+    }
+
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        Set<Film> userFilms = new HashSet<>(filmStorage.getFilmsLikedByUser(userId));
+        Set<Film> friendFilms = new HashSet<>(filmStorage.getFilmsLikedByUser(friendId));
+
+        userFilms.retainAll(friendFilms);
+
+        return userFilms.stream()
+                .sorted((f1, f2) -> Integer.compare(
+                        filmStorage.getLikesCount(f2.getId()),
+                        filmStorage.getLikesCount(f1.getId()))
+                )
+                .collect(Collectors.toList());
     }
 }
