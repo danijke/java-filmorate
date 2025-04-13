@@ -163,6 +163,11 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         return existsMany(q, (Object[]) filmIds);
     }
 
+    @Override
+    public Film wrapSetFilmEntity(Film film) {
+        return setFilmEntity(film);
+    }
+
     private Film setFilmEntity(Film film) {
         film.setMpa(ratingStorage.findRatingById(film.getMpa().getId())
                 .orElseThrow(() -> new NotFoundException("mpa рейтинг не найден для фильма с id: " + film.getId())));

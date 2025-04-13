@@ -124,7 +124,6 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
         return existsMany(q, (Object[]) userIds);
     }
 
-
     private void checkEmailCollision(User user) {
         String q = "SELECT EXISTS(SELECT 1 FROM users WHERE email = ? AND user_id <> ?)";
         if (exists(q, user.getEmail(), user.getId())) {
@@ -133,5 +132,4 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
                     ));
         }
     }
-
 }
