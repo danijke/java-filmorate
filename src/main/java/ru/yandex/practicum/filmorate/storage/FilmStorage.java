@@ -26,4 +26,6 @@ public interface FilmStorage {
     Collection<Film> getSortFilms(Long directorId, String sortBy);
 
     boolean containsFilmsByIds(Long... filmIds);
+    Collection<Film> getFilmsLikedByUser(Long userId);
+    int getLikesCount(Long filmId);
 }
