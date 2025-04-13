@@ -87,11 +87,9 @@ public class FilmService {
 
         userFilms.retainAll(friendFilms);
 
-        Map<Long, Integer> likesMap = userFilms.stream()
-                .collect(Collectors.toMap(
-                        Film::getId,
-                        film -> filmStorage.getLikesCount(film.getId())
-                ));
+        Map<Long, Integer> likesMap = filmStorage.getLikesCountForFilms(
+                userFilms.stream().map(Film::getId).collect(Collectors.toSet())
+        );
 
         return userFilms.stream()
                 .sorted((f1, f2) -> Integer.compare(
