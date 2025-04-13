@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.*;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
@@ -16,23 +17,40 @@ public class ReviewService {
     private final ReviewStorage reviewStorage;
     private final UserService userService;
     private final FilmService filmService;
+    private final FeedService feedService;
 
     public Review create(Review review) {
         validateReviewEntity(review);
-        return reviewStorage.saveReview(review)
-                .orElseThrow(
-                        () -> new NotFoundException("ошибка при получении сохраненного отзыва из бд"));
+        Review saved = reviewStorage.saveReview(review)
+                .orElseThrow(() -> new NotFoundException("ошибка при получении сохраненного отзыва из бд"));
+
+        saveFeedEvent(saved.getUserId(), "ADD", saved.getReviewId());
+        log.info("Пользователь {} добавил отзыв {}", saved.getUserId(), saved.getReviewId());
+
+        return saved;
     }
 
     public Review update(Review review) {
         validateReviewEntity(review);
         if (review.getReviewId() == null) throw new ValidationException("id должен быть указан");
-        return reviewStorage.updateReview(review)
+
+        Review updated = reviewStorage.updateReview(review)
                 .orElseThrow(() -> new NotFoundException("отзыв с id = " + review.getReviewId() + " не найден"));
+
+        saveFeedEvent(updated.getUserId(), "UPDATE", updated.getReviewId());
+        log.info("Пользователь {} обновил отзыв {}", updated.getUserId(), updated.getReviewId());
+
+        return updated;
     }
 
     public void delete(Long reviewId) {
+        Review review = reviewStorage.findReviewById(reviewId)
+                .orElseThrow(() -> new NotFoundException("отзыв с id = " + reviewId + " не найден"));
+
         reviewStorage.removeReview(reviewId);
+
+        saveFeedEvent(review.getUserId(), "REMOVE", reviewId);
+        log.info("Пользователь {} удалил отзыв {}", review.getUserId(), reviewId);
     }
 
     public Review get(Long reviewId) {
@@ -69,5 +87,18 @@ public class ReviewService {
     private void validateReviewEntity(Review review) {
         userService.checkUsersExist(review.getUserId());
         filmService.checkFilmsExist(review.getFilmId());
+    }
+
+    private void saveFeedEvent(Long userId, String operation, Long reviewId) {
+        Event event = Event.builder()
+                .timestamp(System.currentTimeMillis())
+                .userId(userId)
+                .eventType("REVIEW")
+                .operation(operation)
+                .entityId(reviewId)
+                .build();
+
+        feedService.addEvent(event);
+        log.info("Событие сохранено: {}", event);
     }
 }
