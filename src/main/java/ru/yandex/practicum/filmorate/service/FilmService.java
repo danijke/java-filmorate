@@ -66,7 +66,15 @@ public class FilmService {
 
     }
 
-    private void validateFilm(Film film) {
+    public void checkFilmsExist(Long... filmIds) {
+        if (!filmStorage.containsFilmsByIds(filmIds)) {
+            throw new NotFoundException(
+                    String.format("фильмы c id : %s не найдены", Arrays.toString(filmIds))
+            );
+        }
+    }
+
+    private void validateFilmEntity(Film film) {
         ratingService.validateMpaId(film.getMpa().getId());
         genreService.validateGenres(film.getGenres());
         directorService.validateDirectors(film.getDirectors());
