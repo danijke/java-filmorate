@@ -4,7 +4,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserRecommendationService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
@@ -15,6 +17,7 @@ import java.util.Collection;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final UserRecommendationService userRecommendationService;
 
     @GetMapping
     public Collection<User> findAll() {
@@ -71,5 +74,10 @@ public class UserController {
             @PathVariable Long otherId
     ) {
         return userService.getJointFriends(userId, otherId);
+    }
+
+    @GetMapping("{userId}/recommendations")
+    public Collection<Film> getRecommendations(@PathVariable Long userId) {
+       return userRecommendationService.getRecommendations(userId);
     }
 }
