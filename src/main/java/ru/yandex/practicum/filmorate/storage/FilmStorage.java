@@ -30,4 +30,6 @@ public interface FilmStorage {
     Collection<Film> getFilmsLikedByUser(Long userId);
 
     Map<Long, Integer> getLikesCountForFilms(Collection<Long> filmIds);
+
+    Collection<Film> searchFilms(String query, boolean searchByTitle, boolean searchByDirector);
 }

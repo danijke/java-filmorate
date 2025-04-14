@@ -98,4 +98,24 @@ public class FilmService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    public Collection<Film> searchFilms(String query, String by) {
+        if (query == null || query.isBlank()) {
+            throw new ValidationException("Поисковой запрос не может быть пустым");
+        }
+
+        if (by == null || by.isBlank()) {
+            throw new ValidationException("Поле поиска должно быть указано");
+        }
+
+        String[] fields = by.toLowerCase().split(",");
+        boolean searchByTitle = Arrays.asList(fields).contains("title");
+        boolean searchByDirector = Arrays.asList(fields).contains("director");
+
+        if (!searchByTitle && !searchByDirector) {
+            throw new ValidationException("Поле поиска должно содержать 'title' или 'director'");
+        }
+
+        return filmStorage.searchFilms(query, searchByTitle, searchByDirector);
+    }
 }
