@@ -180,11 +180,11 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public Collection<Film> getFilmsLikedByUser(Long userId) {
         String sql = """
-        SELECT f.*
-        FROM films f
-        JOIN user_film_likes ufl ON f.film_id = ufl.film_id
-        WHERE ufl.user_id = ?
-        """;
+                SELECT f.*
+                FROM films f
+                JOIN user_film_likes ufl ON f.film_id = ufl.film_id
+                WHERE ufl.user_id = ?
+                """;
         return findMany(sql, userId).stream()
                 .map(this::setFilmEntity)
                 .toList();
@@ -199,11 +199,11 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 .collect(Collectors.joining(", "));
 
         String sql = String.format("""
-        SELECT film_id, COUNT(user_id) AS likes
-        FROM user_film_likes
-        WHERE film_id IN (%s)
-        GROUP BY film_id
-    """, inSql);
+                    SELECT film_id, COUNT(user_id) AS likes
+                    FROM user_film_likes
+                    WHERE film_id IN (%s)
+                    GROUP BY film_id
+                """, inSql);
 
         return jdbc.query(sql, filmIds.toArray(), rs -> {
             Map<Long, Integer> result = new HashMap<>();
@@ -213,4 +213,39 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             return result;
         });
     }
+
+    @Override
+    public Collection<Film> searchFilms(String query, boolean searchByTitle, boolean searchByDirector) {
+        if (!searchByTitle && !searchByDirector) {
+            return Collections.emptyList();
+        }
+
+        String likeQuery = "%" + query.toLowerCase() + "%";
+        List<Object> params = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("""
+        SELECT DISTINCT f.*
+        FROM films f
+        LEFT JOIN films_directors fd ON f.film_id = fd.film_id
+        LEFT JOIN directors d ON fd.director_id = d.director_id
+        WHERE
+    """);
+
+        if (searchByTitle && searchByDirector) {
+            sql.append("LOWER(f.film_name) LIKE ? OR LOWER(d.director_name) LIKE ?");
+            params.add(likeQuery);
+            params.add(likeQuery);
+        } else if (searchByTitle) {
+            sql.append("LOWER(f.film_name) LIKE ?");
+            params.add(likeQuery);
+        } else {
+            sql.append("LOWER(d.director_name) LIKE ?");
+            params.add(likeQuery);
+        }
+
+        return findMany(sql.toString(), params.toArray()).stream()
+                .map(this::setFilmEntity)
+                .toList();
+    }
+
 }
+
