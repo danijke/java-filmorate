@@ -216,19 +216,24 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public Collection<Film> searchFilms(String query, boolean searchByTitle, boolean searchByDirector) {
-        if (!searchByTitle && !searchByDirector) {
-            return Collections.emptyList();
-        }
+        if (!searchByTitle && !searchByDirector) return Collections.emptyList();
 
         String likeQuery = "%" + query.toLowerCase() + "%";
         List<Object> params = new ArrayList<>();
+
         StringBuilder sql = new StringBuilder("""
-        SELECT DISTINCT f.*
-        FROM films f
-        LEFT JOIN films_directors fd ON f.film_id = fd.film_id
-        LEFT JOIN directors d ON fd.director_id = d.director_id
-        WHERE
-    """);
+                    SELECT DISTINCT f.*
+                    FROM films f
+                """);
+
+        if (searchByDirector) {
+            sql.append("""
+                        LEFT JOIN films_directors fd ON f.film_id = fd.film_id
+                        LEFT JOIN directors d ON fd.director_id = d.director_id
+                    """);
+        }
+
+        sql.append("WHERE ");
 
         if (searchByTitle && searchByDirector) {
             sql.append("LOWER(f.film_name) LIKE ? OR LOWER(d.director_name) LIKE ?");
@@ -246,6 +251,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 .map(this::setFilmEntity)
                 .toList();
     }
+
 
 }
 
