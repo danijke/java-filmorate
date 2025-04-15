@@ -21,9 +21,12 @@ public class FeedDbStorage implements FeedStorage {
     @Override
     public void saveEvent(Event event) {
         String sql = """
-            INSERT INTO feed (timestamp, user_id, event_type, operation, entity_id)
-            VALUES (?, ?, ?, ?, ?)
-        """;
+                    INSERT INTO feed (timestamp, user_id, event_type_id, operation_id, entity_id)
+                    VALUES (?, ?,
+                        (SELECT event_type_id FROM event_types WHERE name = ?),
+                        (SELECT operation_id FROM operations WHERE name = ?),
+                        ?)
+                """;
 
         jdbc.update(sql,
                 event.getTimestamp(),
@@ -37,12 +40,20 @@ public class FeedDbStorage implements FeedStorage {
     @Override
     public List<Event> findEventsByUserId(Long userId) {
         String sql = """
-        SELECT * FROM feed
-        WHERE user_id = ?
-        ORDER BY timestamp ASC
+        SELECT f.event_id, f.timestamp, f.user_id,
+               et.name AS event_type,
+               op.name AS operation,
+               f.entity_id
+        FROM feed f
+        JOIN event_types et ON f.event_type_id = et.event_type_id
+        JOIN operations op ON f.operation_id = op.operation_id
+        WHERE f.user_id = ?
+        ORDER BY f.timestamp ASC
     """;
+
         List<Event> events = jdbc.query(sql, eventMapper, userId);
         log.info("Лента событий для пользователя {}: {}", userId, events);
         return events;
     }
+
 }

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.*;
-import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -49,14 +48,14 @@ public class UserService {
     public void addFriend(Long userId, Long friendId) {
         checkUsersExist(userId, friendId);
         userStorage.addFriend(userId, friendId);
-        saveFeedEvent(userId, "FRIEND", "ADD", friendId);
+        feedService.addEvent(userId, "FRIEND", "ADD", friendId);
         log.info("пользователь {} добавил в друзья пользователя {}", userId, friendId);
     }
 
     public void deleteFriend(Long userId, Long friendId) {
         checkUsersExist(userId, friendId);
         userStorage.deleteFriend(userId, friendId);
-        saveFeedEvent(userId, "FRIEND", "REMOVE", friendId);
+        feedService.addEvent(userId, "FRIEND", "REMOVE", friendId);
         log.info("пользователь {} удалил из друзей пользователя {}", userId, friendId);
     }
 
@@ -74,19 +73,6 @@ public class UserService {
                     String.format("пользователи c id : %s не найдены", Arrays.toString(userIds))
             );
         }
-    }
-
-    private void saveFeedEvent(Long userId, String eventType, String operation, Long entityId) {
-        Event event = Event.builder()
-                .timestamp(System.currentTimeMillis())
-                .userId(userId)
-                .eventType(eventType)
-                .operation(operation)
-                .entityId(entityId)
-                .build();
-
-        feedService.addEvent(event);
-        log.info("Событие сохранено: {}", event);
     }
 
 }

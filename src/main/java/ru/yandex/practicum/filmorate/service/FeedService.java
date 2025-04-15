@@ -19,6 +19,18 @@ public class FeedService {
         log.info("Добавлено событие: {}", event);
     }
 
+    public void addEvent(Long userId, String eventType, String operation, Long entityId) {
+        Event event = Event.builder()
+                .timestamp(System.currentTimeMillis())
+                .userId(userId)
+                .eventType(eventType)
+                .operation(operation)
+                .entityId(entityId)
+                .build();
+
+        addEvent(event);
+    }
+
     public List<Event> getFeedByUserId(Long userId) {
         log.info("Запрошена лента событий для пользователя {}", userId);
         return feedDbStorage.findEventsByUserId(userId);
