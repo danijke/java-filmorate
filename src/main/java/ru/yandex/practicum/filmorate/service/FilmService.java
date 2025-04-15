@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.*;
-import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -49,13 +48,13 @@ public class FilmService {
 
     public void setLike(Long filmId, Long userId) {
         filmStorage.setLike(filmId, userId);
-        saveFeedEvent(userId, "LIKE", "ADD", filmId);
+        feedService.addEvent(userId, "LIKE", "ADD", filmId);;
         log.info("Пользователь {} лайкнул фильм {}", userId, filmId);
     }
 
     public void deleteLike(Long filmId, Long userId) {
         filmStorage.deleteLike(filmId, userId);
-        saveFeedEvent(userId, "LIKE", "REMOVE", filmId);
+        feedService.addEvent(userId, "LIKE", "REMOVE", filmId);
         log.info("Пользователь {} удалил лайк у фильма {}", userId, filmId);
 
     }
@@ -125,18 +124,4 @@ public class FilmService {
 
         return filmStorage.searchFilms(query, searchByTitle, searchByDirector);
     }
-
-    private void saveFeedEvent(Long userId, String eventType, String operation, Long entityId) {
-        Event event = Event.builder()
-                .timestamp(System.currentTimeMillis())
-                .userId(userId)
-                .eventType(eventType)
-                .operation(operation)
-                .entityId(entityId)
-                .build();
-
-        feedService.addEvent(event);
-        log.info("Событие сохранено: {}", event);
-    }
-
 }

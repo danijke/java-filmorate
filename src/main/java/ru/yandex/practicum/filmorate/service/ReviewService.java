@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.*;
-import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
@@ -24,7 +23,7 @@ public class ReviewService {
         Review saved = reviewStorage.saveReview(review)
                 .orElseThrow(() -> new NotFoundException("ошибка при получении сохраненного отзыва из бд"));
 
-        saveFeedEvent(saved.getUserId(), "ADD", saved.getReviewId());
+        feedService.addEvent(saved.getUserId(), "REVIEW", "ADD", saved.getReviewId());
         log.info("Пользователь {} добавил отзыв {}", saved.getUserId(), saved.getReviewId());
 
         return saved;
@@ -37,7 +36,8 @@ public class ReviewService {
         Review updated = reviewStorage.updateReview(review)
                 .orElseThrow(() -> new NotFoundException("отзыв с id = " + review.getReviewId() + " не найден"));
 
-        saveFeedEvent(updated.getUserId(), "UPDATE", updated.getReviewId());
+        feedService.addEvent(updated.getUserId(), "REVIEW", "UPDATE", updated.getReviewId());
+
         log.info("Пользователь {} обновил отзыв {}", updated.getUserId(), updated.getReviewId());
 
         return updated;
@@ -49,7 +49,7 @@ public class ReviewService {
 
         reviewStorage.removeReview(reviewId);
 
-        saveFeedEvent(review.getUserId(), "REMOVE", reviewId);
+        feedService.addEvent(review.getUserId(), "REVIEW", "REMOVE", reviewId);
         log.info("Пользователь {} удалил отзыв {}", review.getUserId(), reviewId);
     }
 
@@ -87,18 +87,5 @@ public class ReviewService {
     private void validateReviewEntity(Review review) {
         userService.checkUsersExist(review.getUserId());
         filmService.checkFilmsExist(review.getFilmId());
-    }
-
-    private void saveFeedEvent(Long userId, String operation, Long reviewId) {
-        Event event = Event.builder()
-                .timestamp(System.currentTimeMillis())
-                .userId(userId)
-                .eventType("REVIEW")
-                .operation(operation)
-                .entityId(reviewId)
-                .build();
-
-        feedService.addEvent(event);
-        log.info("Событие сохранено: {}", event);
     }
 }
