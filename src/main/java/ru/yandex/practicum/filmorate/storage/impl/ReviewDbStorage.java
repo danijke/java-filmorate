@@ -42,15 +42,13 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
 
         String query = """
                 UPDATE reviews SET
-                content = ?, is_positive = ?, user_id = ?, film_id = ?
+                content = ?, is_positive = ?
                 WHERE review_id = ?
                 """;
 
         boolean saved = update(query,
                 review.getContent(),
                 review.getIsPositive(),
-                review.getUserId(),
-                review.getFilmId(),
                 review.getReviewId());
 
         if (!saved) throw new NotSavedException("ошибка при обновлении отзыва в БД");

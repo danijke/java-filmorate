@@ -48,7 +48,7 @@ public class FilmService {
 
     public void setLike(Long filmId, Long userId) {
         filmStorage.setLike(filmId, userId);
-        feedService.addEvent(userId, "LIKE", "ADD", filmId);;
+        feedService.addEvent(userId, "LIKE", "ADD", filmId);
         log.info("Пользователь {} лайкнул фильм {}", userId, filmId);
     }
 

@@ -4,8 +4,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Event;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 @Component
 public class EventMapper implements RowMapper<Event> {

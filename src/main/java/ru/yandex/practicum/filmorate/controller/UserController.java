@@ -4,15 +4,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Event;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserRecommendationService;
-import ru.yandex.practicum.filmorate.service.FeedService;
-import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.service.*;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -87,6 +82,6 @@ public class UserController {
 
     @GetMapping("{userId}/recommendations")
     public Collection<Film> getRecommendations(@PathVariable Long userId) {
-       return userRecommendationService.getRecommendations(userId);
+        return userRecommendationService.getRecommendations(userId);
     }
 }

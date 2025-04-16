@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Event;
-import ru.yandex.practicum.filmorate.storage.impl.FeedDbStorage;
+import ru.yandex.practicum.filmorate.storage.FeedStorage;
 
 import java.util.List;
 
@@ -12,10 +12,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class FeedService {
-    private final FeedDbStorage feedDbStorage;
+    private final FeedStorage feedStorage;
 
     public void addEvent(Event event) {
-        feedDbStorage.saveEvent(event);
+        feedStorage.saveEvent(event);
         log.info("Добавлено событие: {}", event);
     }
 
@@ -33,7 +33,7 @@ public class FeedService {
 
     public List<Event> getFeedByUserId(Long userId) {
         log.info("Запрошена лента событий для пользователя {}", userId);
-        return feedDbStorage.findEventsByUserId(userId);
+        return feedStorage.findEventsByUserId(userId);
 
     }
 }

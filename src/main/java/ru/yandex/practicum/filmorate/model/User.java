@@ -25,4 +25,11 @@ public class User {
     @NotNull
     @Past(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
+
+    public String getName() {
+        if (name == null || name.isBlank()) {
+            name = login;
+        }
+        return name;
+    }
 }
