@@ -25,7 +25,7 @@ public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage
     }
 
     @Override
-    public void saveFilmGenres(Long filmId, List<Genre> genres) {
+    public void saveFilmGenres(Long filmId, Set<Genre> genres) {
         String query = """
                 INSERT INTO film_genres (film_id, genre_id)
                 SELECT ?, ?
@@ -49,7 +49,7 @@ public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage
     }
 
     @Override
-    public void updateFilmGenres(Long filmId, List<Genre> genres) {
+    public void updateFilmGenres(Long filmId, Set<Genre> genres) {
         removeFilmGenres(filmId);
         if (genres != null) saveFilmGenres(filmId, genres);
     }

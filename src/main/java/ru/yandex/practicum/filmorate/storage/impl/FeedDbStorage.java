@@ -2,11 +2,11 @@ package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.*;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Event;
-import ru.yandex.practicum.filmorate.storage.FeedStorage;
+import ru.yandex.practicum.filmorate.storage.*;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 public class FeedDbStorage implements FeedStorage {
-
+    private final UserStorage userStorage;
     private final JdbcTemplate jdbc;
     private final RowMapper<Event> eventMapper;
 
@@ -39,6 +39,11 @@ public class FeedDbStorage implements FeedStorage {
 
     @Override
     public List<Event> findEventsByUserId(Long userId) {
+        if (!userStorage.containsUsersByIds(userId)) {
+            throw new NotFoundException(
+                    String.format("пользователь c id : %s не найден", userId)
+            );
+        }
         String sql = """
         SELECT f.event_id, f.timestamp, f.user_id,
                et.name AS event_type,

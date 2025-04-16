@@ -17,9 +17,6 @@ public class UserService {
     private final FeedService feedService;
 
     public User create(User user) {
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
-        }
         return userStorage.saveUser(user).orElseThrow(() ->
                 new NotFoundException("ошибка при получении сохраненного пользователя из бд: " + user.getLogin()));
     }

@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 import ru.yandex.practicum.filmorate.validator.DateConstraint;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Set;
 
 
 @Data
@@ -21,7 +21,7 @@ public class Film {
     @Size(max = 200, message = "Максимальная длина описания — 200 символов")
     String description;
 
-    List<Genre> genres;
+    Set<Genre> genres;
 
     Set<Director> directors;
     @NotNull(message = "У фильма должен быть указан рейтинг MPA")
@@ -33,5 +33,4 @@ public class Film {
 
     @Positive
     long duration;
-
 }
