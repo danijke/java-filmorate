@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.validator;
 import jakarta.validation.ConstraintViolation;
 import org.junit.jupiter.api.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -21,6 +22,7 @@ public class FilmValidationTest extends BaseValidationTest {
                 .description("A".repeat(200))
                 .releaseDate(LocalDate.of(1895, 12, 28))
                 .duration(1)
+                .mpa(new Rating(1L,"G"))
                 .build();
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
@@ -39,6 +41,6 @@ public class FilmValidationTest extends BaseValidationTest {
                 .build();
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        assertThat(violations).hasSize(4);
+        assertThat(violations).hasSize(5);
     }
 }

@@ -10,3 +10,11 @@ INSERT INTO genres (genre_name) SELECT 'Мультфильм' WHERE NOT EXISTS (
 INSERT INTO genres (genre_name) SELECT 'Триллер' WHERE NOT EXISTS (SELECT 1 FROM genres WHERE genre_name = 'Триллер');
 INSERT INTO genres (genre_name) SELECT 'Документальный' WHERE NOT EXISTS (SELECT 1 FROM genres WHERE genre_name = 'Документальный');
 INSERT INTO genres (genre_name) SELECT 'Боевик' WHERE NOT EXISTS (SELECT 1 FROM genres WHERE genre_name = 'Боевик');
+
+INSERT INTO event_types (name) SELECT 'LIKE' WHERE NOT EXISTS (SELECT 1 FROM event_types WHERE name = 'LIKE');
+INSERT INTO event_types (name) SELECT 'REVIEW' WHERE NOT EXISTS (SELECT 1 FROM event_types WHERE name = 'REVIEW');
+INSERT INTO event_types (name) SELECT 'FRIEND' WHERE NOT EXISTS (SELECT 1 FROM event_types WHERE name = 'FRIEND');
+
+INSERT INTO operations (name) SELECT 'ADD' WHERE NOT EXISTS (SELECT 1 FROM operations WHERE name = 'ADD');
+INSERT INTO operations (name) SELECT 'REMOVE' WHERE NOT EXISTS (SELECT 1 FROM operations WHERE name = 'REMOVE');
+INSERT INTO operations (name) SELECT 'UPDATE' WHERE NOT EXISTS (SELECT 1 FROM operations WHERE name = 'UPDATE');

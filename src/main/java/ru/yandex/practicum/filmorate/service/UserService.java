@@ -7,20 +7,18 @@ import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.Collection;
+import java.util.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
+    private final FeedService feedService;
 
     public User create(User user) {
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
-        }
         return userStorage.saveUser(user).orElseThrow(() ->
-                new NotFoundException("ошибка при сохранении пользователя: " + user.getLogin()));
+                new NotFoundException("ошибка при получении сохраненного пользователя из бд: " + user.getLogin()));
     }
 
     public User update(User newUser) {
@@ -29,6 +27,10 @@ public class UserService {
         }
         return userStorage.update(newUser).orElseThrow(() ->
                 new NotFoundException("пользователь с id = " + newUser.getId() + " не найден"));
+    }
+
+    public void delete(Long userId) {
+        userStorage.removeUser(userId);
     }
 
     public Collection<User> findAll() {
@@ -43,12 +45,14 @@ public class UserService {
     public void addFriend(Long userId, Long friendId) {
         checkUsersExist(userId, friendId);
         userStorage.addFriend(userId, friendId);
+        feedService.addEvent(userId, "FRIEND", "ADD", friendId);
         log.info("пользователь {} добавил в друзья пользователя {}", userId, friendId);
     }
 
     public void deleteFriend(Long userId, Long friendId) {
         checkUsersExist(userId, friendId);
         userStorage.deleteFriend(userId, friendId);
+        feedService.addEvent(userId, "FRIEND", "REMOVE", friendId);
         log.info("пользователь {} удалил из друзей пользователя {}", userId, friendId);
     }
 
@@ -60,10 +64,13 @@ public class UserService {
         return userStorage.getJointFriends(userId, friendId);
     }
 
-    private void checkUsersExist(Long userId, Long friendId) {
-        if (!userStorage.containsUserByIds(userId, friendId)) {
-            throw new NotFoundException("один или оба пользователя не найдены");
+    public void checkUsersExist(Long... userIds) {
+        if (!userStorage.containsUsersByIds(userIds)) {
+            throw new NotFoundException(
+                    String.format("пользователи c id : %s не найдены", Arrays.toString(userIds))
+            );
         }
     }
+
 }
 //todo добавить проверку на уникальный email в валидацию в будущем

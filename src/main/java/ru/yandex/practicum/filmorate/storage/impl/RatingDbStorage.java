@@ -1,13 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
 import org.springframework.jdbc.core.*;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.storage.RatingStorage;
 
 import java.util.*;
 
-@Component
+@Repository
 public class RatingDbStorage extends BaseDbStorage<Rating> implements RatingStorage {
     public RatingDbStorage(JdbcTemplate jdbc, RowMapper<Rating> mapper) {
         super(jdbc, mapper);

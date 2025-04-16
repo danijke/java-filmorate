@@ -1,13 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
 import org.springframework.jdbc.core.*;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.util.*;
 
-@Component
+@Repository
 public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage {
     public GenreDbStorage(JdbcTemplate jdbc, RowMapper<Genre> mapper) {
         super(jdbc, mapper);
@@ -25,7 +25,7 @@ public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage
     }
 
     @Override
-    public void saveFilmGenres(Long filmId, List<Genre> genres) {
+    public void saveFilmGenres(Long filmId, Set<Genre> genres) {
         String query = """
                 INSERT INTO film_genres (film_id, genre_id)
                 SELECT ?, ?
@@ -40,6 +40,18 @@ public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage
             ps.setLong(3, filmId);
             ps.setLong(4, genre.getId());
         });
+    }
+
+    @Override
+    public void removeFilmGenres(Long filmId) {
+        String q = "DELETE FROM film_genres WHERE film_id = ?";
+        update(q, filmId);
+    }
+
+    @Override
+    public void updateFilmGenres(Long filmId, Set<Genre> genres) {
+        removeFilmGenres(filmId);
+        if (genres != null) saveFilmGenres(filmId, genres);
     }
 
     @Override

@@ -39,7 +39,7 @@ public class BaseDbStorage<T> {
         return Optional.ofNullable(keyHolder.getKeyAs(Long.class));
     }
 
-    protected void saveMany(String query, List<T> entities, ParameterizedPreparedStatementSetter<T> setter) {
+    protected void saveMany(String query, Collection<T> entities, ParameterizedPreparedStatementSetter<T> setter) {
         jdbc.batchUpdate(query, entities, entities.size(), setter);
     }
 
@@ -50,6 +50,13 @@ public class BaseDbStorage<T> {
     protected boolean exists(String query, Object... params) {
         return Optional.ofNullable(jdbc.queryForObject(query, Boolean.class, params))
                 .orElse(false);
+    }
+
+    protected boolean existsMany(String q, Object... params) {
+        if (params == null || params.length == 0) return false;
+
+        String placeholders = String.join(",", Collections.nCopies(params.length, "?"));
+        return exists(String.format(q, params.length, placeholders), params);
     }
 
 }

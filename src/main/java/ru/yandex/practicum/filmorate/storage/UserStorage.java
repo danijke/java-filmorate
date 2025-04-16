@@ -17,11 +17,11 @@ public interface UserStorage {
 
     boolean addFriend(Long userId, Long friendId);
 
-    boolean deleteFriend(Long userId, Long friendId);
+    void deleteFriend(Long userId, Long friendId);
 
     Collection<User> getAllFriends(Long userId);
 
     Collection<User> getJointFriends(Long userId, Long friendId);
 
-    boolean containsUserByIds(Long userId, Long friendId);
+    boolean containsUsersByIds(Long... userIds);
 }

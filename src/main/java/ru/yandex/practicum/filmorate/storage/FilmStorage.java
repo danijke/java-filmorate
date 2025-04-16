@@ -20,4 +20,16 @@ public interface FilmStorage {
     void setLike(Long filmId, Long userId);
 
     void deleteLike(Long filmId, Long userId);
+
+    Film wrapSetFilmEntity(Film film);
+
+    Collection<Film> getSortFilms(Long directorId, String sortBy);
+
+    boolean containsFilmsByIds(Long... filmIds);
+
+    Collection<Film> getFilmsLikedByUser(Long userId);
+
+    Map<Long, Integer> getLikesCountForFilms(Collection<Long> filmIds);
+
+    Collection<Film> searchFilms(String query, boolean searchByTitle, boolean searchByDirector);
 }
