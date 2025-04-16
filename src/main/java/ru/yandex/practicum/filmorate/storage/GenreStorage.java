@@ -7,11 +7,11 @@ import java.util.*;
 public interface GenreStorage {
     Collection<Genre> findGenresByFilmId(Film film);
 
-    void saveFilmGenres(Long filmId, List<Genre> genres);
+    void saveFilmGenres(Long filmId, Set<Genre> genres);
 
     void removeFilmGenres(Long filmId);
 
-    void updateFilmGenres(Long filmId, List<Genre> genres);
+    void updateFilmGenres(Long filmId, Set<Genre> genres);
 
     Optional<Genre> findGenreById(Long id);
 

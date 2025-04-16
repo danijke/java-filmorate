@@ -24,7 +24,7 @@ public class GenreService {
         return genreStorage.findAll();
     }
 
-    public void validateGenres(List<Genre> genres) {
+    public void validateGenres(Set<Genre> genres) {
         if (genres != null) {
             genres.stream()
                     .filter(genre -> genre.getId() > genreStorage.getGenresCount())

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.*;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.*;
@@ -10,6 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
+@Slf4j
 public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     GenreStorage genreStorage;
     RatingStorage ratingStorage;
@@ -95,7 +97,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         genreStorage.updateFilmGenres(newFilm.getId(), newFilm.getGenres());
         directorStorage.updateFilmDirectors(newFilm.getId(), newFilm.getDirectors());
 
-        return Optional.of(newFilm);
+        return findFilmById(newFilm.getId());
     }
 
     @Override
@@ -115,18 +117,23 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public void setLike(Long filmId, Long userId) {
-        String query = "INSERT INTO user_film_likes (film_id, user_id) VALUES (?, ?)";
-        if (!update(query, filmId, userId)) {
-            throw new NotSavedException(
-                    String.format("ошибка при сохранении лайка пользователя %s у фильма %s", userId, filmId
-                    ));
-        }
+        String query = """
+                MERGE INTO user_film_likes
+                USING DUAL ON (film_id = ? AND user_id = ?)
+                WHEN NOT MATCHED THEN
+                INSERT (film_id, user_id)
+                VALUES (?, ?)
+                """;
+        update(query, filmId, userId, filmId, userId);
+        log.info("Фильму ID_{} добавлен лайк от пользователя ID_{}", filmId, userId);
     }
 
     @Override
     public void deleteLike(Long filmId, Long userId) {
         String query = "DELETE FROM user_film_likes WHERE film_id = ? AND user_id = ?";
-        update(query, filmId, userId);
+        if (!update(query, filmId, userId)) {
+            throw new NotFoundException("Лайк не найден или пользователь не существует");
+        }
     }
 
     @Override
@@ -148,10 +155,16 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             default -> throw new ValidationException("Invalid sort parameter");
         };
 
-        return findMany(query, directorId)
+        Collection<Film> films = findMany(query, directorId)
                 .stream()
                 .map(this::setFilmEntity)
                 .toList();
+
+        if (films.isEmpty()) {
+            throw new NotFoundException("Режиссёр не найден или у него нет фильмов");
+        }
+
+        return films;
     }
 
     @Override
@@ -172,7 +185,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private Film setFilmEntity(Film film) {
         film.setMpa(ratingStorage.findRatingById(film.getMpa().getId())
                 .orElseThrow(() -> new NotFoundException("mpa рейтинг не найден для фильма с id: " + film.getId())));
-        film.setGenres(new ArrayList<>(genreStorage.findGenresByFilmId(film)));
+        film.setGenres(new LinkedHashSet<>(genreStorage.findGenresByFilmId(film)));
         film.setDirectors(new HashSet<>(directorStorage.findDirectorsByFilmId(film)));
         return film;
     }
@@ -222,8 +235,9 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         List<Object> params = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder("""
-                    SELECT DISTINCT f.*
+                    SELECT DISTINCT f.*, COUNT(ufl.user_id) AS likes
                     FROM films f
+                    LEFT JOIN user_film_likes ufl ON f.film_id = ufl.film_id
                 """);
 
         if (searchByDirector) {
@@ -247,11 +261,14 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             params.add(likeQuery);
         }
 
+        sql.append("""
+                GROUP BY f.film_id
+                ORDER BY likes DESC NULLS LAST
+                """);
+
         return findMany(sql.toString(), params.toArray()).stream()
                 .map(this::setFilmEntity)
                 .toList();
     }
-
-
 }
 
